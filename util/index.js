@@ -16,11 +16,6 @@ export const delay = setTimeout
 delay.clear = clearTimeout
 export const sleep = ms => new Promise(done => delay(done, ms))
 
-Def.use(Object.is, {
-  o(x) { return typeof x == 'object' && !!x },
-  O(x) { return toString.call(x) == '[object Object]' },
-})
-
 Def.use(Array, {
   is(x) {
     return Array.isArray(x)
@@ -38,7 +33,6 @@ Def.use(Array.prototype, {
   get tail() { return this.at(-1) },
   get uniqe() { return Array.from(new Set(this)) },
 })
-
 
 Def.use(String.prototype, {
   get up() { return this.toUpperCase() },
