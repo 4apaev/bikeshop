@@ -1,0 +1,20 @@
+# ui: 'bdd'
+# bail: false
+# sort: false
+# diff: true
+exit: true
+# color: true
+# recursive: true
+# retries: 1
+# timeout: 0
+# package: './package.json'
+# require: '@babel/register'
+# file:
+#   - '/path/to/some/file'
+# ignore:
+#   - '/path/to/some/ignored/file'
+# spec:
+# - 'test/**/*.spec.js' # the positional arguments!
+
+
+

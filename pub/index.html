@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>BikeShop</title>
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="32" font-size="32">🛵</text></svg>'/>
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <script type="module">
+    import Def from './define.js'
+    import Sync from './Sync.js'
+    import JQ from './dom.js'
+
+    window.$ = JQ
+    window.Def = Def
+    window.Sync = Sync
+  </script>
+</head>
+
+<body class="layout grid-box">
+
+  <header class="grid head">
+    <h1>settings</h1>
+    <div class="user">
+      <button>login</button>
+      <button>logout</button>
+      <button>signup</button>
+    </div>
+  </header>
+
+  <aside class="grid side">
+    <a href="#sign-in">sign-in</a>
+    <a href="#sign-up">sign-up</a>
+  </aside>
+
+  <main class="grid main tabs">
+      <form id="sign-up" class=tab>
+        <legend>sign up</legend>
+        <label for=mail>email</label>
+        <input name=mail type=email  />
+        <label for=pass>password</label>
+        <input name=pass type=password/>
+        <button class="btn ok">sign up</button>
+      </form>
+
+      <form  id="sign-in" class="tab">
+        <legend>sign in</legend>
+        <label for=mail>email</label>
+        <input name=mail type=email  />
+        <label for=pass>password</label>
+        <input name=pass type=password/>
+        <button class="btn ok">sign up</button>
+      </form>
+
+  </main>
+</body>
+</html>

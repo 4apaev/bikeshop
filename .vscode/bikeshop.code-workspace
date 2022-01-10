@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "path": ".."
+    },
+    // {
+    //   "path": "../../sandbox/http"
+    // },
+    // {
+    //   "path": "../../dev-env/http-tools"
+    // }
+  ],
+  "settings": {
+    // "terminal.integrated.env.osx": {
+    //   "NODE_ENV": "dev",
+    //   "PORT": "3000",
+    //   "DEBUG": "*",
+    // },
+
+    // "sqltools.connections": [
+    //   {
+    //     "previewLimit": 50,
+    //     "server": "localhost",
+    //     "port": 5432,
+    //     "driver": "PostgreSQL",
+    //     "name": "bshop",
+    //     "database": "bike_shop",
+    //     "username": "postgres",
+    //     "password": "pnimit"
+    //   }
+    // ],
+
+  }
+}
+

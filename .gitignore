@@ -1,0 +1,9 @@
+.DS_Store
+.env
+.idea
+.c8temp
+.c8cover
+*.txt
+coverage
+node_modules
+test.js
