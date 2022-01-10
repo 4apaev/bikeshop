@@ -21,12 +21,6 @@ export function fromHead(x, fallback = '') {
 }
 
 /**
- * @example
- * fromFile('/a/b.c', 'css')
- *    -> text/styl
- *
- * fromFile('/dir/file', 'css')
- *
  * @param {string|URL} file
  * @param {string} [fallback]
  * @return {string}
