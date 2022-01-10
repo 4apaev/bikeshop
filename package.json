@@ -20,7 +20,7 @@
     "down": "docker-compose down",
     "start": "npm run migrate && node wheels/koa.js",
     "migrate": "npm run down && npm run up && sleep 3 && node db/migrate.js",
-    "test": "c8 --check-coverage mocha",
+    "test": "c8 --check-coverage mocha ./tests/*.spec.js",
     "lint": "eslint --fix src",
     "mocha": "mocha",
     "types": "tsc src/**/*.js"
