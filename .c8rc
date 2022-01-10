@@ -12,7 +12,7 @@
   "include": [
     "db/**",
     "util/**",
-    "wheels/**",
+    "wheels/**"
   ],
 
   "exclude": [
