@@ -74,7 +74,7 @@ randBgColor.pairs = [                                                           
   [ 47, 30 ], [ 47, 31 ], [ 47, 32 ],             [ 47, 34 ], [ 47, 35 ], [ 47, 36 ],
 ]
 
-randBgColor.i = rand(randBgColor.pairs.length)
+randBgColor.i = 0 // rand(randBgColor.pairs.length)
 
 
 
