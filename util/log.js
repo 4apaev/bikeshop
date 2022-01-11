@@ -30,16 +30,16 @@ use(Log, {
     return Log
   },
 
-  write(s, a, soc = process.stdout) {
+  write(s, ...a) {
     if (Array.isArray(s?.raw)) {
       for (let i = 0; i < a.length; i++)
-        soc.write(s.raw[ i ], inspect(a[ i ]))
-      soc.write(s.raw.at(-1))
+        process.stdout.write(s.raw[ i ], inspect(a[ i ]))
+      process.stdout.write(s.raw.at(-1))
     }
     else {
-      soc.write(format(s, ...a))
+      process.stdout.write(format(s, ...a))
     }
-    soc.write('\n')
+    process.stdout.write('\n')
   },
 
   debug(prefix) {
