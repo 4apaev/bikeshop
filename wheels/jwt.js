@@ -8,7 +8,7 @@ import {
 } from 'crypto'
 
 const { BIKESHOP_SECRET: secret } = process.cwd()
-const LNK = randomUUID()
+const LNK = '.'
 
 export const rand = randomInt
 export const uuid = randomUUID
