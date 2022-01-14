@@ -1,67 +1,32 @@
-import { STATUS_CODES as CODES } from 'http'
-import { isNativeError } from 'util/types'
+import { STATUS_CODES } from 'http'
 
-const { assign } = Object
-const { construct: Ctor } = Reflect
-
-export default class Fail extends Error {
-
+export default class EpicFail extends Error {
   name = 'Fail'
 
-  constructor(...a) {
-    const { msg, ...opt } = parse(a)
-    super(msg, opt)
-
+  constructor(m, cause) {
+    super(m, cause)
     Error.captureStackTrace(this, this.constructor)
-    this.opt = opt
-    this.message = msg
-  }
+    this.cause ??= cause
 
-  get code() {
-    return this.opt.code
-  }
-
-  toString() {
-    return [ this.code + ':' + this.name, this.message, this.stack ].join('\n')
+    if (m in STATUS_CODES)
+      this.message = STATUS_CODES[ m ]
   }
 
   static as() {
-    return Ctor(this, arguments)
+    return Reflect.construct(this, arguments)
   }
 
-  static throws() {
-    throw Ctor(this, arguments)
+  static raise(m, c) {
+    throw this.as(m, c)
   }
 
-  static reject() {
-    return Promise.reject(Ctor(this, arguments))
-  }
-}
-
-export class HTTPFail extends Fail {
-  name = 'HTTPFail'
-}
-
-function parse(it) {
-  let cause
-  let code
-  let msg
-  let opt = {}
-  for (const a of it) {
-    let t = typeof a
-    if (a instanceof Error || isNativeError(a))
-      cause = a
-    else if (t == 'object')
-      assign(opt, a)
-    else if (t == 'string')
-      msg ??= a
-    else if (t == 'number')
-      code ??= a
+  static assert(x, m) {
+    x || this.raise(m, { cause: 'assert' })
   }
 
-  code ??= opt.code ?? cause?.code ?? 418
-  msg ??= CODES[ code ] ?? 'Epic Fail'
-  return assign({ msg, code, cause }, opt)
+  static reject(x, m) {
+    return Promise.reject(this.as(x, m))
+  }
 }
 
 

@@ -1,26 +1,12 @@
-/* eslint-disable no-unused-vars */
-
 import {
   format,
   inspect,
 } from 'util'
 
-// inspect.defaultOptions.colors = true
-
 const { BIKESHOP_DEBUG: DEBUG = '*' } = process.env
 const Log = use(console.log.bind(console), console)
-export default Log
 
-Log.B = Log.black   = Log.bind(null, `\x1b[30m%s\x1b[39m`)
-Log.r = Log.red     = Log.bind(null, `\x1b[31m%s\x1b[39m`)
-Log.g = Log.green   = Log.bind(null, `\x1b[32m%s\x1b[39m`)
-Log.y = Log.yellow  = Log.bind(null, `\x1b[33m%s\x1b[39m`)
-Log.b = Log.blue    = Log.bind(null, `\x1b[34m%s\x1b[39m`)
-Log.m = Log.magenta = Log.bind(null, `\x1b[35m%s\x1b[39m`)
-Log.c = Log.cyan    = Log.bind(null, `\x1b[36m%s\x1b[39m`)
-Log.w = Log.white   = Log.bind(null, `\x1b[37m%s\x1b[39m`)
-
-use(Log, {
+export default use(Log, {
   format,
   inspect,
 
@@ -54,10 +40,6 @@ function use(a, b) {
   return Object.defineProperties(a, Object.getOwnPropertyDescriptors(b))
 }
 
-function rand(x) {
-  return 0 | Math.random() * x
-}
-
 function randBgColor(x) {
   const [ a, b ] = randBgColor.pairs[ randBgColor.i++ % randBgColor.pairs.length ]
   return format(`\x1b[%sm\x1b[%sm %s \x1b[0m`, a, b, x)
@@ -74,8 +56,16 @@ randBgColor.pairs = [                                                           
   [ 47, 30 ], [ 47, 31 ], [ 47, 32 ],             [ 47, 34 ], [ 47, 35 ], [ 47, 36 ],
 ]
 
-randBgColor.i = 0 // rand(randBgColor.pairs.length)
+randBgColor.i = 0 /* 0 | Math.random() * randBgColor.pairs.length */; `
 
-
+Black red
+green yellow
+blue  magenta
+cyan  white
+`.match(/\w+/g).forEach((c, i) => {
+    let a = c[ 0 ]
+    let b = c.toLowerCase()
+    Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3%sm%s\x1b[39m`, i)
+  })
 
 

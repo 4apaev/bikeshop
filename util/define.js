@@ -54,7 +54,9 @@ function merge(...a) {
 
 use(def, {
   use, get, alias, merge,
-
+  entries, fromEntries,
+  create, assign,
+  
   get o() {
     return create(null)
   },
