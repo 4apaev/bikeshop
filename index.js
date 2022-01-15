@@ -1,22 +1,22 @@
 /* eslint-disable no-unused-vars */
 
-import { Log } from '../util/index.js'
-import Router from './router.js'
-import * as User from '../service/user.js'
-import * as Bike from '../service/bike.js'
+import { Log } from './util/index.js'
+import Router from './wheels/router.js'
+import * as User from './service/user.js'
+import * as Bike from './service/bike.js'
 
 
 import {
   logger,
   reqPayload,
-} from './middleware.js'
+} from './wheels/middleware.js'
 
 import {
   send,
   statiq,
-} from './middleware.static.js'
+} from './wheels/middleware.static.js'
 
-import { port } from '../config/config.js'
+import { port } from './config/config.js'
 
 const debug = Log.debug('app')
 const app = new Router
@@ -38,9 +38,4 @@ app.post('/api/user/auth', User.auth)
 app.post('/api/user', User.create)
 app.post('/api/bike', Bike.create)
 
-
-
-
-
 app.listen(port, () => debug('Server started on port', port))
-
