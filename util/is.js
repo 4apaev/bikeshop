@@ -1,6 +1,6 @@
 import { Stream } from 'stream'
 import { isDeepStrictEqual } from 'util'
-import Fail from './errors.js'
+import Fail from './fail.js'
 
 let NOT = false; let FAIL = false
 

@@ -1,10 +1,10 @@
 import O from './define.js'
 import Is from './is.js'
 import Log from './log.js'
-import Fail from './errors.js'
+import Fail from './fail.js'
 
-export { O }
 export {
+  O,
   Is,
   Log,
   Fail,

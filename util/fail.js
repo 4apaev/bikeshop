@@ -16,15 +16,15 @@ export default class EpicFail extends Error {
     return Reflect.construct(this, arguments)
   }
 
-  static raise(m, c) {
-    throw this.as(m, c)
-  }
-
   static assert(x, m) {
     x || this.raise(m, { cause: 'assert' })
   }
 
-  static reject(x, m) {
+  static raise(m, c) {
+    throw this.as(m, c)
+  }
+
+  static deny(x, m) {
     return Promise.reject(this.as(x, m))
   }
 }
