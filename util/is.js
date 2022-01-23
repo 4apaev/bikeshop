@@ -19,6 +19,7 @@ export default function Is(a, b, c) { // eslint-disable-next-line multiline-tern
 }
 
 Is.use = (name, fn) => Is[ name ] = fn(It)
+Is.tos = x => toString.call(x).slice(8, -1)
 
 Is.a = (x, m) => It(m, Array.isArray(x))
 Is.i = (x, m) => It(m, Number.isInteger(x))
@@ -31,7 +32,7 @@ Is.f = (x, m) => It(m, typeof x == 'function')
 Is.o = (x, m) => It(m, typeof x == 'object' && !!x)
 Is.eq  = (a, b, m) => It(m, isDeepStrictEqual(a, b))
 Is.it  = (a, b, m) => {
-  const c = toString.call(b).slice(8, -1)
+  const c = Is.tos(b)
   return It(m, typeof a == 'function'
     ? c == a.name || Object(b) instanceof a
     : c == a)
