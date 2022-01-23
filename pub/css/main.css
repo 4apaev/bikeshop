@@ -12,7 +12,7 @@
   --c-br:   rgba(205, 215, 230, .1);
   --c-br-1: rgba(205, 215, 230, .25);
 
-  --c-shd:  rgba(0, 0, 0, .2);
+  --c-shd:  rgba(148, 148, 148, 0.2);
   --c-shd-1:rgba(0, 0, 0, .3);
 
   --c-ok:    #9be9a8;
@@ -66,6 +66,9 @@ body {
   color: var(--c-fg);
   background-color: var(--c-bg);
 }
+
+ul { list-style: none; }
+
 a {
   color: var(--c-info);
   text-decoration: none;
@@ -98,6 +101,22 @@ input:hover, button:hover {
   background: var(--c-bg-1);
 }
 
+form {
+  border-radius: var(--rds);
+  border: 1px solid var(--c-fg-1);
+}
+
+fieldset {
+  border: none;
+  background: var(--c-bg);
+  padding: 0 var(--pad);
+  box-shadow: 0 1px 0 var(--c-fg-1)
+}
+
+fieldset:last-child {
+  box-shadow: none
+}
+
 pre {
   padding: 1em;
   margin: 1em;
@@ -112,7 +131,16 @@ pre:focus {
   background-color: var(--bg-dark-focus);
 }
 
-ul { list-style: none; }
+dialog {
+  width: 32rem;
+  padding: 1rem;
+  margin: 0 auto;
+  border: 1px solid var(--c-fg-1);
+  background: var(--c-bg);
+  border-radius: var(--rds);
+  box-shadow: 0 2px 5px var(--c-shd-1);
+}
+
 
 .row {
   display: flex;
@@ -234,5 +262,6 @@ ul { list-style: none; }
   padding: 1rem;
   border-radius: 3px;
   box-shadow: var(--brd-main);
+  white-space: pre-wrap;
 }
 
