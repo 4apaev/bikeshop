@@ -6,7 +6,19 @@ import {
 const { BIKESHOP_DEBUG: DEBUG = '*' } = process.env
 const Log = use(console.log.bind(console), console)
 
-export default use(Log, {
+export default function Log(s, ...a) {
+  if (isRaw(s)) {                                        // eslint-disable-next-line no-var
+    for (var i = 0, args = [ s.raw[ i ] ]; i < a.length;)
+      args = args.concat(inspect(a[ i++ ]), s.raw[ i ])
+    console.log.apply(console, args)
+  }
+  else {
+    console.log.apply(console, arguments)
+  }
+}
+
+use(Log, console)
+use(Log, {
   format,
   inspect,
 
