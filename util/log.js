@@ -4,7 +4,7 @@ import {
 } from 'util'
 
 const { BIKESHOP_DEBUG: DEBUG = '*' } = process.env
-const Log = use(console.log.bind(console), console)
+const debuggers = new Set
 
 export default function Log(s, ...a) {
   if (isRaw(s)) {                                        // eslint-disable-next-line no-var
@@ -24,7 +24,6 @@ use(Log, {
 
   get reset() {
     process.stdout.write(`\x1b[0m`)
-    process.stderr.write(`\x1b[0m`)
     return Log
   },
 
@@ -41,6 +40,7 @@ use(Log, {
   },
 
   debug(prefix) {
+    debuggers.add(prefix)
     const head = randBgColor(prefix)
     return DEBUG == '*' || DEBUG.includes(prefix)
       ? (s, ...a) => Log(head, format(s, ...a))
@@ -48,10 +48,16 @@ use(Log, {
   },
 })
 
+export function getDebuggers(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
+  ctx.body = [ ...debuggers ]
+}
 
 function isRaw(x) {
   return Array.isArray(x?.raw)
 }
+
 function use(a, b) {
   return Object.defineProperties(a, Object.getOwnPropertyDescriptors(b))
 }
@@ -72,16 +78,15 @@ randBgColor.pairs = [                                                           
   [ 47, 30 ], [ 47, 31 ], [ 47, 32 ],             [ 47, 34 ], [ 47, 35 ], [ 47, 36 ],
 ]
 
-randBgColor.i = 0 /* 0 | Math.random() * randBgColor.pairs.length */; `
-
-Black red
-green yellow
-blue  magenta
-cyan  white
-`.match(/\w+/g).forEach((c, i) => {
-    let a = c[ 0 ]
-    let b = c.toLowerCase()
-    Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3%sm%s\x1b[39m`, i)
-  })
+randBgColor.i = 0 /* 0 | Math.random() * randBgColor.pairs.length */; [
+  'Black', 'red',
+  'green', 'yellow',
+  'blue',  'magenta',
+  'cyan',  'white',
+].forEach((c, i) => {
+  let a = c[ 0 ]
+  let b = c.toLowerCase()
+  Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3${ i }sm%s\x1b[39m`)
+})
 
 
