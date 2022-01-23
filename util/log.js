@@ -17,7 +17,7 @@ export default use(Log, {
   },
 
   write(s, ...a) {
-    if (Array.isArray(s?.raw)) {
+    if (isRaw(s)) {
       for (let i = 0; i < a.length; i++)
         process.stdout.write(s.raw[ i ], inspect(a[ i ]))
       process.stdout.write(s.raw.at(-1))
@@ -36,6 +36,10 @@ export default use(Log, {
   },
 })
 
+
+function isRaw(x) {
+  return Array.isArray(x?.raw)
+}
 function use(a, b) {
   return Object.defineProperties(a, Object.getOwnPropertyDescriptors(b))
 }
