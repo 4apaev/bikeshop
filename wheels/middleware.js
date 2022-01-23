@@ -1,8 +1,4 @@
-/* eslint-disable no-unused-vars */
 // @ts-check
-
-import Fs from 'fs'
-import Path from 'path'
 import * as Mim from './mim.js'
 import * as Jwt from './jwt.js'
 import { Log } from '../util/index.js'
@@ -46,11 +42,6 @@ export async function logger(ctx, next) {
   console.log('%d %s %s %s', ctx.status, ctx.method, ctx.path, Date.now() - start)
 }
 
-/** @type {Middleware} */
-export function favicon(ctx, next) {
-  ctx.type = Mim.ico
-  ctx.body = Buffer.from(`data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==`)
-}
 
 /** @type {Middleware} */
 export async function reqPayload(ctx, next) {
@@ -68,7 +59,7 @@ export async function reqPayload(ctx, next) {
 
 /** @type {Middleware} */
 function parsePayload(ctx, next) {
-  if (!ctx.is('json'))
+  if (!ctx.is(Mim.json))
     return next()
 
   if (ctx.payload.length < 2) {
@@ -92,18 +83,3 @@ function parsePayload(ctx, next) {
     }
   }
 }
-
-/*
-  export async function reqPayloadSimple(ctx, next) {
-    if (!methods.has(ctx.method))
-      return next()
-
-    ctx.payload = ''
-    ctx.req.setEncoding('utf8')
-    ctx.req.on('data', x => ctx.payload += x)
-    ctx.req.on('sfinish', () => parsePayload(ctx, next))
-  }
- */
-
-
-
