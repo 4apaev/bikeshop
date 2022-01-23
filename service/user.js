@@ -14,7 +14,7 @@ export /** @type {Middleware} */ const get = respond(User.get, {
   debug,
   msg: 'user not found',
   before(ctx) {
-    return { id: new URL(ctx.url, 'file:').searchParams.get('id') }
+    return { id: ctx.URL.searchParams.get('id') }
   },
 
   validate(o) {
@@ -22,9 +22,29 @@ export /** @type {Middleware} */ const get = respond(User.get, {
   },
 })
 
+export /** @type {Middleware} */ const query = respond(User.list, {
+  debug,
+  msg: 'user not found',
+  before(ctx) { // @ts-ignore
+    let limit = parseInt(ctx.URL.searchParams.get('limit')) || 10
+    return { limit }
+  },
+
+  validate() {
+    return true
+  },
+})
+
 export /** @type {Middleware} */ const create = respond(User.create, {
   debug,
   msg: 'fail to create user',
+  before(ctx) { // @ts-ignore
+    return {
+      name: ctx?.payload?.name ?? ctx?.payload?.uname,
+      mail: ctx?.payload?.mail ?? ctx?.payload?.email,
+      pass: ctx?.payload?.pass ?? ctx?.payload?.password,
+    }
+  },
   validate(o) {
     return validate(o, [ 'name', 'mail', 'pass' ])
   },

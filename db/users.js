@@ -12,10 +12,10 @@ import query from './db.js'
  */
 export function create({ name, mail, pass }) {
   return query(`
-  insert into users(name, mail, pass)
+  insert into users(uname, email, pass)
     values($1, $2, crypt($3, gen_salt('bf')))
     returning
-      id, name, mail;
+      id, uname, mail;
   `, [ name, mail, pass ], 1)
 }
 
@@ -32,6 +32,19 @@ export function get({ id }) {
       limit
         1;
   `, [ id ], 1)
+}
+
+/**
+ * @async
+ * @prop {number} limit
+ * @return {Promise<QRes>}
+ */
+export function list({ limit = 10 }) {
+  return query(`
+    select id, uname, email from users
+      limit
+        $1;
+  `, [ limit ])
 }
 
 /**
