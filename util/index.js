@@ -13,7 +13,10 @@ export {
 export const echo = x => x
 export const delay = setTimeout
 delay.clear = clearTimeout
-export const sleep = ms => new Promise(done => delay(done, ms))
+
+export function sleep(ms) {
+  return new Promise(done => delay(done, ms))
+}
 
 export function sanitizePath(x) {
   return x.split('/').reduce((prev, next) => {
@@ -24,6 +27,31 @@ export function sanitizePath(x) {
     return prev
   }, []).join('/')
 }
+
+export function pipe(...fns) {
+  return prev =>
+    fns.reduce((prev, next) =>
+      next(prev), prev)
+}
+
+export function compose(...fns) {
+  return prev =>
+    fns.reduceRight((prev, next) =>
+      next(prev), prev)
+}
+
+export function bind(fn, when, strategy) {
+  const i = when == 'after'
+  const argv = strategy == 'merge'
+    ? (a, b) => a.map((x, i) => b[ i ] ?? x)
+    : (a, b) => a.concat(b)
+
+  return (...a) => (...b) => {
+    const ctx = [ a, b ][ +i  ].shift()
+    return fn.apply(ctx, argv(a, b))
+  }
+}
+
 
 O.use(Array, {
   is(x) {
