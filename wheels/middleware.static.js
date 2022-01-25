@@ -1,5 +1,8 @@
 // @ts-check
 import Fs from 'fs'
+import {
+  stat as Stats,
+} from 'fs/promises'
 import Path from 'path'
 import Styl from 'stylus'
 import {
@@ -11,7 +14,6 @@ const debug = Log.debug('static')
 
 /** @typedef {import("koa").Context} Context */
 /** @typedef {import("koa").Middleware} Middleware */
-
 
 /**
  * @param {string} [base]
@@ -40,11 +42,22 @@ export function send(file) {
  */
 export async function sendFile(ctx, file) {
   try {
-    const stat = await Fs.promises.stat(file)
+    const stat = await Stats(file)
+
+    if (ETag(ctx, stat)) return
+
     ctx.status = 200
-    ctx.length = stat.size
-    ctx.type = Mim.fromFile(file, 'txt')
-    ctx.body = Fs.createReadStream(file)
+    if (file.endsWith('.styl')) {
+      ctx.type = 'css'
+      ctx.body = await compileAsync(file, ctx.URL.searchParams) // @ts-ignore
+      ctx.length = Buffer.byteLength(ctx.body)
+    }
+    else {
+      ctx.type = Mim.fromFile(file, 'txt')
+      ctx.body = Fs.createReadStream(file)
+      ctx.length = stat.size
+    }
+    ctx.lastModified = stat.mtime
   }
   catch (e) {
     debug('[not found]', e)
