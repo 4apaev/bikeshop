@@ -33,30 +33,30 @@ export default function def() {
   return o
 }
 
-function use(a, b) {
+export function use(a, b) {
   return def(1, 0, 1, a, b)
 }
 
-function get(a, b) {
+export function get(a, b) {
   return b
     ? getDesc(a, b)
     : getDescs(a)
 }
 
-function alias(a, b, c = b, d = a) {
+export function alias(a, b, c = b, d = a) {
   typeof c == 'string' || (d = c, c = b)
   return defineProperty(d, c, getDesc(a, b))
 }
 
-function merge(...a) {
+export function mix(...a) {
   return assign(O.o, ...a)
 }
 
 use(def, {
-  use, get, alias, merge,
+  use, get, alias, mix,
   entries, fromEntries,
   create, assign,
-  
+
   get o() {
     return create(null)
   },
