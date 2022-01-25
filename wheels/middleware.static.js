@@ -49,3 +49,19 @@ export async function sendFile(ctx, file) {
     ctx.type = 'html'
   }
 }
+
+/**
+ * @param {Context} ctx
+ * @param {Fs.Stats} stat
+ * @return {boolean}
+ */
+function ETag(ctx, stat) {
+  const tag = `"W/${ stat.mtime.getTime().toString(16) }-${ stat.size.toString(16) }"`
+  if (ctx.req.headers[ 'if-none-match' ] === tag) {
+    ctx.status = 304
+    return true
+  }
+  ctx.set('ETag',  tag)
+  ctx.set('Last-Modified',  stat.mtime.toUTCString())
+  return false
+}
