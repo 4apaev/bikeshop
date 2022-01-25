@@ -1,9 +1,7 @@
 // @ts-check
 import Fs from 'fs'
 import Path from 'path'
-import { Log } from '../util/index.js'
-import * as Mim from './mim.js'
-
+import Styl from 'stylus'
 const debug = Log.debug('static')
 
 /** @typedef {import("koa").Context} Context */
@@ -64,4 +62,34 @@ function ETag(ctx, stat) {
   ctx.set('ETag',  tag)
   ctx.set('Last-Modified',  stat.mtime.toUTCString())
   return false
+}
+
+/**
+ * @param { string } filename
+ * @param {{ (e?: Error, css?: string): void }} fn
+ * @param { URLSearchParams } opts
+ */
+export default function compile(filename, fn, opts) {
+
+
+  return Fs.readFile(filename, 'utf-8', (e, css) => e
+    ? fn(e)
+    : Styl(css, {
+      filename,
+      globals: Object.fromEntries(opts),
+    }).render(fn))
+}
+
+/**
+ * @param { string } filename
+ * @param { URLSearchParams } opts
+ * @returns { Promise<string> }
+ */
+export function compileAsync(filename, opts) {
+  return new Promise((ok, nope) => compile(filename, (e, css) => {
+    if (e)
+      nope(e)
+    else
+      ok(css)
+  }, opts))
 }
