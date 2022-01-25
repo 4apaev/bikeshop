@@ -15,6 +15,16 @@ export const delay = setTimeout
 delay.clear = clearTimeout
 export const sleep = ms => new Promise(done => delay(done, ms))
 
+export function sanitizePath(x) {
+  return x.split('/').reduce((prev, next) => {
+    if (next == '..')
+      prev.pop()
+    else if (next != '.')
+      prev.push(next)
+    return prev
+  }, []).join('/')
+}
+
 O.use(Array, {
   is(x) {
     return Array.isArray(x)
