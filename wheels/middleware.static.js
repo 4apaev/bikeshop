@@ -2,6 +2,11 @@
 import Fs from 'fs'
 import Path from 'path'
 import Styl from 'stylus'
+import {
+  Log,
+  sanitizePath,
+} from '../util/index.js'
+import * as Mim from './mim.js'   // @ts-ignore
 const debug = Log.debug('static')
 
 /** @typedef {import("koa").Context} Context */
@@ -15,9 +20,10 @@ const debug = Log.debug('static')
 export function statiq(base, dict) {
   base ??= process.cwd()
   dict ??= { '/': '/index.html' }
-
-  return /** @type {Middleware} */ ctx =>
-    sendFile(ctx, Path.join(base, dict[ ctx.path ] ?? ctx.path))
+  return /** @type {Middleware} */ ctx => {
+    let path = sanitizePath(ctx.path)
+    return sendFile(ctx, Path.join(base, dict[ path ] ?? path))
+  }
 }
 
 /**
