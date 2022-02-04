@@ -90,7 +90,6 @@ function ETag(ctx, stat) {
  */
 export default function compile(filename, fn, opts) {
 
-
   return Fs.readFile(filename, 'utf-8', (e, css) => e
     ? fn(e)
     : Styl(css, {

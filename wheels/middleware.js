@@ -5,6 +5,7 @@ import { Log } from '../util/index.js'
 
 /** @typedef {import("koa").Middleware} Middleware */
 
+// @ts-ignore
 const debug = Log.debug('middleware')
 
 export const methods = new Set([
@@ -13,7 +14,6 @@ export const methods = new Set([
   'PATHCH',
   'DELETE',
 ])
-
 
 /** @type {Middleware} */
 export function useAuth(ctx, next) {
@@ -34,14 +34,12 @@ export function useAuth(ctx, next) {
   ctx.body = 'authentication required'
 }
 
-
 /** @type {Middleware} */
 export async function logger(ctx, next) {
   const start = Date.now()
   await next()
   console.log('%d %s %s %s', ctx.status, ctx.method, ctx.path, Date.now() - start)
 }
-
 
 /** @type {Middleware} */
 export async function reqPayload(ctx, next) {

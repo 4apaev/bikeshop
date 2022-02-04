@@ -34,7 +34,6 @@ export function fromFile(file, fallback = '') {
     : fallback
 }
 
-
 function init() {
   const mm = Object.create(null)
   for (const line of `
@@ -61,7 +60,6 @@ function init() {
       mm[ a ] = type
 
   }
-
   return Object.freeze(mm)
 }
 

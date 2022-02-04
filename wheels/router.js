@@ -2,13 +2,11 @@
 import Koa from 'koa'
 import Http from 'http'
 
-
 /**
  * @callback Route
  * @param { string | RegExp } url
  * @param { Koa.Middleware } cb
  */
-
 
 export default class Router extends Koa {
   /**
