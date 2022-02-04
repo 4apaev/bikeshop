@@ -6,3 +6,6 @@ env:
 
 globals:
   $: true
+  O: true
+  log: true
+  Log: true
