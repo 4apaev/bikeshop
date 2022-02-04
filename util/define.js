@@ -1,6 +1,5 @@
 const O = Object
 
-
 const {
   entries,
   fromEntries,
@@ -10,7 +9,6 @@ const {
   create,
   assign,
 } = O
-
 
 export default function def() {
   let t, o, n, d
