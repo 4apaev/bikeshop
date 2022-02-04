@@ -52,7 +52,6 @@ export function bind(fn, when, strategy) {
   }
 }
 
-
 O.use(Array, {
   is(x) {
     return Array.isArray(x)
