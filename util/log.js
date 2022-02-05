@@ -78,7 +78,7 @@ randBgColor.pairs = [                                                           
   [ 47, 30 ], [ 47, 31 ], [ 47, 32 ],             [ 47, 34 ], [ 47, 35 ], [ 47, 36 ],
 ]
 
-randBgColor.i = 0 /* 0 | Math.random() * randBgColor.pairs.length */; [
+randBgColor.i = 0 | Math.random() * randBgColor.pairs.length; [
   'Black', 'red',
   'green', 'yellow',
   'blue',  'magenta',
@@ -88,5 +88,4 @@ randBgColor.i = 0 /* 0 | Math.random() * randBgColor.pairs.length */; [
   let b = c.toLowerCase()
   Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3${ i }sm%s\x1b[39m`)
 })
-
 
