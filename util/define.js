@@ -11,6 +11,8 @@ const {
 } = O
 
 export default function def() {
+  if (arguments.length === 1)
+    return O(arguments[ 0 ])
   let t, o, n, d
   const cew = []
   for (const a of arguments) {
