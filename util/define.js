@@ -1,70 +1,82 @@
+import Is, { T } from './is.js'
+
+const µ = null
 const O = Object
 
-const {
-  entries,
-  fromEntries,
-  getOwnPropertyDescriptor: getDesc,
-  getOwnPropertyDescriptors: getDescs,
-  defineProperty,
-  create,
-  assign,
-} = O
-
-export default function def() {
+export default function use() {
   if (arguments.length === 1)
     return O(arguments[ 0 ])
-  let t, o, n, d
-  const cew = []
-  for (const a of arguments) {
-    if ((t = (typeof a)[ 0 ]) == 'n' || t == 'b')  cew.push(a)
-    else if (t == 's')  n = a
-    else if (o)  d = a
-    else o = a
-  }
-  let it = n
-    ? [[ n, d ]]
-    : entries(getDescs(d))
-  for (let [ k, v ] of it) {
-    v.enumerable = cew[ 1 ] ?? v.enumerable ?? 1
-    v.configurable = cew[ 0 ] ?? v.configurable ?? 1; v?.get ?? (
-      v.writable = cew[ 2 ] ?? v.writable ?? 1)
-    defineProperty(o, k, v)
-  }
-  return o
-}
 
-export function use(a, b) {
-  return def(1, 0, 1, a, b)
+  let [[ c, e, w ], [ a, b ]] = T.args(arguments, Is.X, [[], []])
+
+  Is.assert.X(a, 'use:trg')
+  Is.assert.X(b, 'use:src')
+
+  for (let k in b = get(b)) {
+    b[ k ].get ?? (
+      w != µ && (b[ k ].writable = w))
+    e != µ && (b[ k ].enumerable = e)
+    c != µ && (b[ k ].configurable = c)
+  }
+  return O.defineProperties(a, b)
 }
 
 export function get(a, b) {
   return b
-    ? getDesc(a, b)
-    : getDescs(a)
+    ? O.getOwnPropertyDescriptor(a, b)
+    : O.getOwnPropertyDescriptors(a)
 }
 
-export function alias(a, b, c = b, d = a) {
-  typeof c == 'string' || (d = c, c = b)
-  return defineProperty(d, c, getDesc(a, b))
+export function alias() {
+  const props = []
+  const targets = []
+  T.args(arguments, Is.X, [ props, targets ])
+
+  const key = props.shift()
+  const src = targets.shift()
+  const desc = get(src, key)
+
+  props.length || props.push(key)
+  targets.length || targets.push(src)
+
+  for (let a of props) {
+    for (let trg of targets)
+      O.defineProperty(trg, a, desc)
+  }
 }
 
-export function mix(...a) {
-  return assign(O.o, ...a)
+export function each(a, cb, prev) {
+  const stop = Symbol('📛')
+  for (let [ next, v ] of a?.entries?.() ?? O.entries(a)) {
+    prev = cb(v, next, prev, stop)
+    if (prev === stop)
+      break
+  }
+  return prev
 }
 
-use(def, {
-  use, get, alias, mix,
-  entries, fromEntries,
-  create, assign,
+alias(O, use, 'create')
+alias(O, use, 'assign', 'assign', 'mix')
+alias(O, use, 'defineProperty', 'define', 'def')
+alias(O, use, 'defineProperties', 'defines')
+alias(O, use, 'getOwnPropertyNames', 'names')
+alias(O, use, 'keys')
+alias(O, use, 'values')
+alias(O, use, 'entries')
+alias(O, use, 'fromEntries', 'fromEntries', 'too')
+
+use(use, {
+  use, get, each, alias,
 
   get o() {
-    return create(null)
+    return O.create(µ)
   },
 
-  from(x) {
-    return Symbol.iterator in O(x)
-      ? fromEntries(x)
-      : entries(x)
+  from(a, b) {
+    return Is.I(a)
+      ? O.fromEntries(a?.entries?.()
+        ?? Array.from(a, b ??= (v, i) => [ i, v ]))
+      : O.entries(a)
   },
+
 })
-

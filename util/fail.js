@@ -1,11 +1,11 @@
-import { STATUS_CODES } from 'http'
-
-export default class EpicFail extends Error {
+export default class Fail extends Error {
   name = 'Fail'
 
-  constructor(msg, cause) {
-    super(...parse(msg, cause))
+  constructor(m, c) {
+    [ m, c ] = parse(m, c)
+    super(m, c)
     Error.captureStackTrace(this, this.constructor)
+    this.message = m
   }
 
   set(k, v) {
@@ -14,28 +14,18 @@ export default class EpicFail extends Error {
       : { [ k ]: v })
   }
 
-  static as() {
-    return Reflect.construct(this, arguments)
-  }
-
-  static assert(a, b) {
-    a || this.raise(b, { cause: 'assert' })
-  }
-
-  static raise() {
-    throw Reflect.construct(this, arguments)
-  }
-
-  static deny() {
-    return Promise.reject(Reflect.construct(this, arguments))
-  }
+  static as = (m, c) => new this(m, c)
+  static assert = (a, b) => a || this.raise(b, { cause: 'assert' })
+  static raise = (m, c) => { throw this.as(m, c) }
+  static deny = (m, c) => Promise.reject(this.as(m, c))
 }
 
+export const deny = Fail.deny
+export const raise = Fail.raise
+export const assert = Fail.assert
+
 function parse(a, b) {
-  [ a, b ] = Error[ Symbol.hasInstance ](a)
+  return Error[ Symbol.hasInstance ](a)
     ? [ 'rethrow: ' + a.message, { cause: a }]
     : [ a, { cause: b?.cause ?? b }]
-  return [ a in STATUS_CODES
-    ? STATUS_CODES[ a ]
-    : a, b ]
 }
