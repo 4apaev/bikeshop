@@ -6,4 +6,6 @@
 *.txt
 coverage
 node_modules
-test.js
+test.*
+tmp.*
+
