@@ -1,41 +1,45 @@
 import O from '../define.js'
+import is from './is.js'
 
 const µ = null
 const A = Array
 const E = new WeakMap
+const STOP = Symbol('📛')
+const doc = document
 
-export function is(a, b) {
-  return arguments.length === 2
-    ? toString.call(b).slice(8, -1) == a?.name ?? a
-    : a != µ
-}
+is.use('node', x => Node[ Symbol.hasInstance ](x))
 
-is.a = x => A.isArray(x)
-is.s = x => typeof x == 'string'
-is.f = x => typeof x == 'function'
-is.o = x => typeof x == 'object' && x
-
-export default function JQ(s, cb) {
-  return cb
-    ? A.from(document.querySelectorAll(s), cb)
-    : document.querySelector(s)
+export default function JQ(q, el = doc, cb) {
+  if (is.f(el))
+    cb = el, el = doc
+  return /^\++/.test(q) || is.f(cb)
+    ? A.from(el.querySelectorAll(q.replace(/^\++/, '')), cb)
+    : el.querySelectorAll(q)
 }
 
 O.use(JQ, {
-  is,
-
   get frag() {
-    return document.createDocumentFragment()
+    return doc.createDocumentFragment()
+  },
+
+  stop(e) {
+    e.stopImmediatePropagation()
+    e.stopPropagation()
+    e.preventDefault()
   },
 
   getEvents(x) {
     return E.get(x)
   },
 
+  text() { return doc.createTextNode.apply(doc, arguments) },
+  attr() { return doc.createAttribute.apply(doc, arguments) },
+  comment() { return doc.createComment.apply(doc, arguments) },
+
   create(name, props, ...children) {
-    const el = document.createElement(name)
+    const el = doc.createElement(name)
     if (props) {
-      if (is(O, props))
+      if (is.O(props))
         el.attr(props)
       else
         el.append(props)
@@ -44,15 +48,22 @@ O.use(JQ, {
     return el
   },
 
-  ico(src, attr) {
-    return JQ.create('embed', O.assign({ src }, attr))
+  ico(id, width = 64, heigth = width) {
+    JQ.svg({ width, heigth },
+      JQ.create('use', {
+        href: '/img/icons.svg#' + id,
+      }))
+    // return JQ.create('embed', O.assign({ src }, attr))
   },
 })
 
 O.alias(Node.prototype, 'textContent', 'text')
 O.alias(Node.prototype, 'parentElement', 'parent')
 
-O.alias(Element.prototype, 'classList', 'clss')
+O.alias(Element.prototype, 'classList', 'cls')
+O.alias(Element.prototype, 'hasAttribute', 'has')
+O.alias(Element.prototype, 'getAttribute', 'get')
+O.alias(Element.prototype, 'toggleAttribute', 'toggle')
 O.alias(Element.prototype, 'querySelector', 'find')
 O.alias(Element.prototype, 'lastElementChild', 'last')
 O.alias(Element.prototype, 'firstElementChild', 'first')
@@ -60,27 +71,30 @@ O.alias(Element.prototype, 'nextElementSibling', 'next')
 O.alias(Element.prototype, 'previousElementSibling', 'prev')
 
 O.use(Element.prototype, {
-
   $(s, cb) {
     return cb
       ? A.from(this.querySelectorAll(s), cb)
       : this.querySelector(s)
   },
 
-  htm(s, ...a) {
-    if (s == µ) return this.innerHTML
-    if (a.length) {
-      // eslint-disable-next-line no-var
+  html(s, ...a) {
+    if (s == µ)
+      return this.innerHTML
+
+    if (a.length) { // eslint-disable-next-line no-var
       for (var i = 0, re = [ s.raw[ 0 ] ]; i < a.length;)
         re = re.concat(a[ i++ ], s.raw[ i ])
       s = re.join('')
     }
-    return this.empty().insert(s)
+    return this.empty().insert(s.trim())
   },
 
-  empty() {
+  empty(cb = x => x) {
     while (this.first)
-      this.removeChild(this.first.off().empty())
+      this.removeChild(cb(this.first.off()))
+
+    while (this.firstChild)
+      this.removeChild(this.firstChild)
     return this
   },
 
@@ -91,59 +105,38 @@ O.use(Element.prototype, {
     return this
   },
 
+  set(k, v) {
+    if (is.b(v ??= false))
+      return this.toggleAttribute(k, v)
+    this.setAttribute(k, v)
+    return this
+  },
+
   attr(k, v) {
     const i = arguments.length
-    if (i === 0)
-      return O.fromEntries(A.from(this.attributes, a => [ a.name, a.value ]))
+    if (i === 0) {
+      return O.too(A.from(this.attributes, a => [ a.name, a.value === ''
+        ? true
+        : a.value ]))
+    }
 
     if (i === 1) {
       if (is.o(k)) {
         for (const [ a, b ] of O.entries(k))
-          this.attr(a, b)
+          this.set(a, b)
+        return this
       }
-      else {
-        return this.getAttribute(k)
-      }
+      return this.getAttribute(k)
     }
-
-    else if (i === 2) {
-      v ??= false
-      let t = (typeof v)[ 0 ]
-      if (t == 'b') {
-        this.toggleAttribute(k, v)
-      }
-
-      else if (t == 'n') {
-        this.setAttribute(k, v)
-      }
-
-      else if (t == 's') {
-        k.startsWith('clas')
-          ? this.classList.add(v)
-          : this.setAttribute(k, v)
-      }
-
-      else if (t == 'o') {
-        if (k.startsWith('class')) {
-          this.classList.add(...[].concat(v))
-        }
-        else {
-          for (const [ a, b ] of O.entries(v))
-            this[ k ][ a ] = b
-        }
-      }
-    }
-    return this
+    return this.set(k, v)
   },
 
-  on(ch, query, cb, ctx) {
-    if (is.f(query))
-      ctx = cb, cb = query, query = null
+  on(ch, query, cb) {
+    is.f(query) && ([ query, cb ] = [ cb, query  ])
 
     const listener = query
-      ? e => e.target.matches(query) && cb.call(ctx, e)
-      : e => cb.call(ctx, e)
-
+      ? e => e.target.matches(query) && STOP === cb(e, STOP) && JQ.stop(e)
+      : e => STOP === cb(e, STOP) && JQ.stop(e)
 
     const off = (a, b) => {
       if ((!a || a === ch) && (!b || b === cb)) {
@@ -184,18 +177,21 @@ O.use(Element.prototype, {
     this.dispatchEvent(ce)
     return this
   },
-
 })
 
-
-for (let t of ` script link style
-                br hr div nav ol ul li dl dt dd
-                table col colgroup caption tr td th thead tbody tfoot
-                main header aside footer hgroup h1 h2 h3 h4 h5 h6
-                article p i q b u s em span pre code del dfn ins kbd
-                section abbr acronym time address cite mark samp blockquote sub sup big small strong strike
-                figure figcaption audio video picture img svg canvas a button dialog  details summary
-                form data datalist fieldset legend label input textarea output meter progress select optgroup option`.match(/\S+/g))
+for (let t of `
+script  link style br hr div nav ol ul li
+dl dt dd table col colgroup caption tr td
+th thead tbody tfoot main header aside h1
+h2 h3 footer hgroup h4 h5 h6 article p i q
+b u s em span pre code del dfn ins kbd mark
+samp section abbr acronym time address cite
+blockquote sub sup big small strong  strike
+figure figcaption  audio video  picture img
+svg textarea canvas a button dialog details
+summary form data datalist  fieldset legend
+label input  output meter  select optgroup
+option       progress                  use
+`.match(/\S+/g))
   JQ[ t ] = JQ.create.bind(µ, t)
-
 
