@@ -15,12 +15,12 @@ ws-router
 
 form
   border-radius: $.radius.b
-  border: 1px solid $.br.a
+  box-shadow: 0 0 0 1px $.br.a
   fieldset
-    padding: 0 1em
+    padding: 1em
     border-bottom: 1px solid $.br.a
-  &:last-child
-    border-bottom-width: 0
+    &:last-child
+      border-bottom-width: 0
 
 pre
   margin: 1em
@@ -39,7 +39,7 @@ dialog
   padding: 1rem
   margin: 4rem auto
   border: 1px solid $.fg.b
-  background: $.bg.a
+  background: $.bg.b
   border-radius: $.radius.a
   box-shadow: 0 2px 5px $.shd.a
 
@@ -62,14 +62,17 @@ dialog
   .grid.side
     grid-area: side
     box-shadow: 1px 0 0 $.br.a
+    a
+      display: flex
+      padding: 0 1em
+      align-items: center
+      justify-content: space-between
+      line-height: 3
+      &:hover
+        background-color: $.br.a
 
   .grid.page
     grid-area: page
     overflow-y: auto
 
-  .grid.side a
-    display: flex
-    padding: 0 1em
-    align-items: center
-    justify-content: space-between
 
