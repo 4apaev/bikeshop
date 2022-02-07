@@ -15,11 +15,10 @@ const dir = readdir(BASE_DIR)
  */
 setTimeout(next, 100)
 
-
 let prev
 function next(e, rs) {
   if (e) {
-    Log.err(`Error at: %s
+    Log.error(`Error at: %s
       %s
       code: %s
       table: %s
