@@ -1,11 +1,22 @@
+/* eslint-disable no-unused-vars */
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
+import {
+  Is,
+  Log,
+} from '../util/index.js'
 
 /**
  * @callback Route
  * @param { string | RegExp } url
  * @param { Koa.Middleware } cb
+ */
+
+/**
+ * @callback isRoute
+ * @param {Koa.Context} ctx
+ * @return {boolean}
  */
 
 export default class Router extends Koa {
@@ -50,30 +61,48 @@ export default class Router extends Koa {
   }
 
   mware() {
-    const argv = []
+    /** @type {Koa.Middleware} */
     let cb
 
+    /** @type {isRoute[]} */
+    const argv = []
+
     for (const a of arguments) {
-      if (typeof a == 'function') {
+      if (Is.f(a))
         cb = a
-      }
-      else if (a instanceof RegExp) {
-        argv.push((/** @type {Koa.Context} */ ctx) => a.test(ctx.path))
-      }
-      else if (typeof a == 'string') {
-        if (isHttpMethod(a))
-          (x => argv.push((/** @type {Koa.Context} */ ctx) => ctx.method === x))(a.toUpperCase())
-        else
-          argv.push((/** @type {Koa.Context} */ ctx) => ctx.path === a)
-      }
+      else if (Is(RegExp, a))
+        argv.push(ctx => a.test(ctx.path))
+
+      else if (Is.s(a)) // eslint-disable-next-line multiline-ternary
+        argv.push(isHttpMethod(a) ? ctx => ctx.method === a.up : rxpath(a))
     }
 
-    typeof cb == 'function' || raise('missing route callback')
+    // @ts-ignore
+    Is.assert.f(cb, 'missing route callback')
 
     this.use(/** @type {Koa.Middleware} */ (ctx, next) =>
       argv.every(fn => fn(ctx))
         ? cb(ctx, next)
         : next())
+  }
+}
+
+/**
+ * @param {string} str
+ * @return {isRoute}
+ */
+export function rxpath(str) {
+  const rx = new RegExp(str
+    .replace(/:(\w+)/g, `(?<$1>w+)`)
+    .replace(/(?<!\\)\//g, `\\/`)
+    .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
+
+  return ctx => {
+    for (const x of ctx.path.matchAll(rx)) {
+      ctx.params = x?.groups ?? {}
+      return true
+    }
+    return false
   }
 }
 
@@ -85,10 +114,4 @@ function isHttpMethod(x) {
   return Http.METHODS.includes(x.toUpperCase())
 }
 
-/**
- * @param {string} x
- * @throws {Error}
- */
-function raise(x) {
-  throw new Error(x)
-}
+Log(rxpath('/define.js'))
