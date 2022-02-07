@@ -1,0 +1,78 @@
+$ = {
+  bg: {
+    a : #424e5a,
+    b : #303841,
+    c : #272e36,
+    d : #1f262e,
+  },
+  fg: {
+    a : #b1c2d5,
+    b : #adbac7,
+    c : #727c86,
+    d : #606b77
+  },
+  br: {
+    a: rgba(205, 215, 230, .1),
+    b: rgba(205, 215, 230, .2),
+    c: rgba(205, 215, 230, .3),
+    d: rgba(205, 215, 230, .4)
+  },
+  shd: {
+    a: rgba(148, 148, 148, .2),
+    b: rgba(0, 0, 0, .2),
+    c: rgba(0, 0, 0, .3),
+    d: rgba(0, 0, 0, .4)
+  },
+  ok  : {
+    a  : #9be9a8,
+    b  : #40c463,
+    c  : #30a14e,
+    d  : #216e39
+  },
+  warn: {
+    a : #ffee4a,
+    b : #ffc501,
+    c : #fe9600,
+    d : #ff7b00
+  },
+  err : {
+    a : #ff5874,
+    b : #f0415e,
+    c : #df2e4b,
+    d : #cf1938
+  },
+  info: {
+    a: #6cb6ff,
+    b: #519ae4,
+    c: #3781ca,
+    d: #2166ac
+  },
+  plum: {
+    a: #C878C8,
+    b: #966496,
+    c: #895689,
+    d: #643264
+  },
+  font: {
+    family: PT Mono,
+    size: {
+      a: 12px,
+      b: 16px,
+      c: 21px
+    }
+  },
+  radius: {
+    a: 3px,
+    b: 5px
+  }
+}
+
+colorize(clr, a, b, c)
+  color: $[ clr ][ a ]
+  border-color: $[ clr ][ a ]
+  $:focus, &.active
+    color: $[ clr ][ b ]
+    border-color: $[ clr ][ b ]
+  &:hover
+    color: $[ clr ][ c ]
+    border-color: $[ clr ][ c ]

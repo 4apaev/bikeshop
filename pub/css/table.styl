@@ -1,0 +1,26 @@
+@require 'theme'
+
+.{uid}
+  padding: 2rem
+  display: block
+
+table
+  width: 100%
+  border-spacing: 0
+  border-collapse: collapse
+
+table, th, td
+  border: 1px solid $.br.b
+
+td, th
+  padding: 0 .5em
+  line-height: 2
+  border-top-width: 0
+  border-left-width: 0
+  &:last-child
+    border-right-width: 0
+th
+  background-color: $.bg.a
+
+tr:last-child td
+  border-bottom-width: 0

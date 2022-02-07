@@ -1,0 +1,24 @@
+@require 'theme'
+
+.tabs
+  .tabs-head
+    padding: 0 1rem
+    line-height: 4
+    box-shadow: 0 1px 0 $.br.a
+
+  .tab
+    display: none
+
+    &:target
+      padding: 1rem
+      display: block
+
+    legend, label, input
+      display: block
+      margin-bottom: 1em
+
+    legend
+      font-weight: bold
+      margin-bottom: 1em
+      text-transform: capitalize
+      text-decoration: underline

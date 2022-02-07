@@ -1,0 +1,63 @@
+@require 'theme'
+
+a
+  color: $.info.b
+  &:focus, &:hover
+    color: $.info.a
+
+input, button
+  padding: 0 1em
+  line-height: 2
+  transition: all .25s
+  border-radius: $.radius.a
+
+  color: $.fg.b
+  border: 1px solid $.br.b
+  background-color: $.bg.b
+
+  &:focus
+    border: 1px solid $.br.c
+
+  &:hover
+    border: 1px solid $.br.d
+
+input:not(:placeholder-shown)
+  &:valid
+    border-color: $.ok.a
+
+  &:invalid
+    border-color: $.err.a
+
+.btn
+  display inline-flex
+  align-items center
+  justify-content center
+  min-width fit-content
+
+.btn.ok
+  colorize('ok', 'b', 'a', 'c')
+
+.btn.info
+  colorize('info', 'b', 'a', 'c')
+
+.btn.warn
+  colorize('warn', 'b', 'a', 'c')
+
+.btn.err
+  colorize('err', 'b', 'a', 'c')
+
+.btn-group
+  display         : flex
+  flex-wrap       : wrap
+  align-items     : center
+  flex-direction  : row
+  justify-content : flex-start
+  border-radius   : $.radius.a
+  padding         : 0
+  border          : 1px solid $.fg.b
+  button
+    border: none;
+    border-radius: 0;
+    &:not(:first-child)
+      box-shadow: inset 1px 0 0 $.fg.b
+
