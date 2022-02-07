@@ -4,8 +4,8 @@ const µ = null
 const O = Object
 
 export default function use() {
-  if (arguments.length === 1)
-    return O(arguments[ 0 ])
+  if (arguments.length < 2)
+    return O(arguments[ 0 ] ?? µ)
 
   let [[ c, e, w ], [ a, b ]] = T.args(arguments, Is.X, [[], []])
 
@@ -64,6 +64,7 @@ alias(O, use, 'keys')
 alias(O, use, 'values')
 alias(O, use, 'entries')
 alias(O, use, 'fromEntries', 'fromEntries', 'too')
+alias(O, use, 'hasOwn', 'own')
 
 use(use, {
   use, get, each, alias,
