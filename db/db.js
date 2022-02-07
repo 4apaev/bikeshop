@@ -3,7 +3,7 @@
 
 import pg from 'pg'
 
-import { Log } from '../util/index.js'
+import Log from '../util/log.js'
 
 import { pgconf } from '../config/config.js'
 
@@ -38,10 +38,39 @@ export default async function query(sql, params, single) {
       ? result?.rows?.[ 0 ]
       : result?.rows,
   }
-
 }
 
+/**
+ * @param {string} table
+ * @param {...string} keys
+ */
+export function where(table, ...keys) {
+  const head = `select ${ keys.join(', ') } from ${ table }`
 
+  return /** @type {QWhere} */ (props, limit = 10) => {
+    let i = 0
+    let params = []
+    let values = []
+    let q = [ head ]
+
+    for (let k of keys) {
+      if (k in props) {
+        params.push(`    ${ k } = $${ ++i }`)
+        values.push(props[ k ])
+      }
+    }
+
+    params.length && q.push('where', params.join(`\n  and\n`))
+    q.push(`limit ${ limit };`)
+    return query(q.join(`\n  `), values)
+  }
+}
+
+/**
+ * @callback QWhere
+ * @param {Object<string, *>} props
+ * @param {number} [limit=10]
+ */
 
 /**
  * @typedef {Object} QRes
@@ -49,51 +78,3 @@ export default async function query(sql, params, single) {
  * @prop {pg.QueryResult} result
  * @prop {?} value
  */
-
-
-
-/*
- * @param {string | pg.QueryArrayConfig<any>} sql
- * @param {string[]} params
- * @param {string} [fallback]
- * @returns {Promise<pg.QueryResult>}
-
-  export default async function Query(sql, params, fallback) {
-    try {
-      return await pool.query(sql, params)
-    }
-    catch (e) {
-      Log.e('[db:error]', e)
-      return fallback ?? e
-    }
-  }
- */
-
-
-
-
-
-
-
-/*
-  Query.client = async ( sql, params, fallback) => {
-    const client = await pool.connect()
-
-    try {
-      return client.query(sql, params)
-    }
-
-    catch (e) {
-      Log.err('[db:error]', e)
-      fallback ??= e
-    }
-
-    finally {
-      client.release()
-    }
-
-    return fallback
-  }
-*/
-
-
