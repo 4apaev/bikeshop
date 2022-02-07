@@ -7,3 +7,6 @@ insert into bikes (kind, details) values
   ('city', 'in good condition'),
   ('road', 'a bit used'),
   ('cruiser', 'trash');
+
+
+insert into users_bikes (uid, bid) values (1, 3), (2, 1), (3, 2);
