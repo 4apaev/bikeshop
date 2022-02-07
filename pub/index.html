@@ -3,56 +3,50 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
+  <meta name="description" content="bikeshop: garage and more">
+  <meta name="theme-color" content="#303841"/>
   <title>BikeShop</title>
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="32" font-size="32">🛵</text></svg>'/>
-  <link rel="stylesheet" type="text/css" href="main.css">
-  <script type="module">
-    import Def from './define.js'
-    import Sync from './Sync.js'
-    import JQ from './dom.js'
 
-    window.$ = JQ
-    window.Def = Def
-    window.Sync = Sync
+  <link rel=icon href="/img/favicon.svg"/>
+  <link rel=stylesheet type="text/css" href="/css/main.styl">
+
+  <script type="module">
+    import O from '/define.js'
+    import $ from '/js/dom.js'
+    import Sync from '/js/Sync.js'
+
+    const Log = O.use(console.log.bind(console), console)
+    Log.c = (c, ...a) => Log('%c%s', `color: ${ c }`, ...a)
+
+    O.assign(globalThis, { O, $, Sync, Log, log: Log })
   </script>
 </head>
 
-<body class="layout grid-box">
+<body>
+   <ws-router id="app" class="grid-box">
+      <header class="grid head">
+        <a route="/" class="logo">🛵</a>
+        <a route="/app/login">login</a>
+      </header>
 
-  <header class="grid head">
-    <h1>settings</h1>
-    <div class="user">
-      <button>login</button>
-      <button>logout</button>
-      <button>signup</button>
-    </div>
-  </header>
+      <aside class="grid side">
+        <a route="/">Home</a>
+        <a route="/app/bikes">Bikes</a>
+        <a route="/app/users">Users</a>
+        <a route="/app/scheduler">Scheduler</a>
+      </aside>
 
-  <aside class="grid side">
-    <a href="#sign-in">sign-in</a>
-    <a href="#sign-up">sign-up</a>
-  </aside>
+      <ws-route path="/"              comp="ws-home"      src="/js/routes/home.js" ></ws-route>
+      <ws-route path="/app/bikes"     comp="ws-bikes"     src="/js/routes/bikes.js" ></ws-route>
+      <ws-route path="/app/users"     comp="ws-users"     src="/js/routes/users.js" ></ws-route>
+      <ws-route path="/app/scheduler" comp="ws-scheduler" src="/js/routes/scheduler.js" ></ws-route>
+      <ws-route path="/app/login"     comp="ws-login"     src="/js/routes/auth.login.js" ></ws-route>
+      <ws-route path="/app/remind"    comp="ws-remind"    src="/js/routes/auth.remind.js"></ws-route>
+      <ws-route path="/app/*"         comp="ws-notfound"></ws-route>
+      <ws-output class="grid page tabs"></ws-outlet>
+    </ws-router>
 
-  <main class="grid main tabs">
-      <form id="sign-up" class=tab>
-        <legend>sign up</legend>
-        <label for=mail>email</label>
-        <input name=mail type=email  />
-        <label for=pass>password</label>
-        <input name=pass type=password/>
-        <button class="btn ok">sign up</button>
-      </form>
-
-      <form  id="sign-in" class="tab">
-        <legend>sign in</legend>
-        <label for=mail>email</label>
-        <input name=mail type=email  />
-        <label for=pass>password</label>
-        <input name=pass type=password/>
-        <button class="btn ok">sign up</button>
-      </form>
-
-  </main>
-</body>
+    <script type="module" src="/js/router.js"></script>
+    <script type="module" src="/js/comp/ico.js"></script>
+  </body>
 </html>
