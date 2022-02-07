@@ -1,85 +1,48 @@
-@import './vars.styl'
-@import './reset.styl'
-
-*
-  margin: 0
-  padding: 0
-  box-sizing: border-box
-
-html
-  scroll-behavior: smooth
-  height: 100%
+@require 'theme'
+@require 'reset'
 
 body
+  line-height: 1
+  font: $.font.size.a/$.font.size.b $.font.family
+  background-color: $.bg.b
+  color: $.fg.b
+
+ws-router
+  display: block
   height: 100%
-  font-family: var(--fnt)
-  font-size: var(--fnt-size)
-  line-height: var(--lnh)
-  color: var(--c-fg)
-  background-color: var(--c-bg)
 
-ul
-  list-style: none
-
-a
-  color: var(--c-info)
-  text-decoration: none
-  &:focus, &:hover
-    outline: none
-    color: var(--c-info-1)
-
-a,button
-  cursor: pointer
-
-input, button
-  transition: all .25s
-  color: var(--c-fg-1)
-  border: 1px solid var(--c-fg-1)
-  background: var(--c-bg)
-  padding: 0 var(--pad)
-  line-height: var(--lh-ui)
-  border-radius: var(--rds)
-  box-shadow: none
-
-  &:focus, &:focus,   &:hover, &:hover
-    outline: none
-    color: var(--c-fg-2)
-    background: var(--c-bg-1)
+@require 'buttons'
 
 form
-  border-radius: var(--rds)
-  border: 1px solid var(--c-fg-1)
-
+  border-radius: $.radius.b
+  border: 1px solid $.br.a
   fieldset
-    border: none
-    background: var(--c-bg)
-    padding: 0 var(--pad)
-    box-shadow: 0 1px 0 var(--c-fg-1)
-
+    padding: 0 1em
+    border-bottom: 1px solid $.br.a
   &:last-child
-    box-shadow: none
+    border-bottom-width: 0
 
 pre
-  padding: 1em
   margin: 1em
-  border-radius: var(--rds)
-  background-color: var(--bg-dark)
-  color: var(--clr-dark)
+  padding: 1em
+  border: $.br.a
+  border-radius: $.radius.b
+  background-color: $.bg.b
+  color: $.fg.b
   transition: all .3s
-
-pre:focus
-  outline: none
-  background-color: lightyellow
-  background-color: var(--bg-dark-focus)
+  &:focus
+    outline: none
+    background-color: $.bg.c
 
 dialog
   width: 32rem
   padding: 1rem
-  margin: 0 auto
-  border: 1px solid var(--c-fg-1)
-  background: var(--c-bg)
-  border-radius: var(--rds)
-  box-shadow: 0 2px 5px var(--c-shd-1)
+  margin: 4rem auto
+  border: 1px solid $.fg.b
+  background: $.bg.a
+  border-radius: $.radius.a
+  box-shadow: 0 2px 5px $.shd.a
+
 
 .grid-box
   display: grid;
@@ -87,52 +50,26 @@ dialog
 
   .grid.head
     grid-area: top
-    box-shadow: 0 1px 0 var(--c-br)
+    box-shadow: 0 1px 0 $.br.a
     display: flex
     flex-direction: row
     justify-content: space-between
     align-items: center
     padding: 0 1rem
+    a.logo
+      font-size: 4em
 
   .grid.side
     grid-area: side
-    box-shadow: 1px 0 0 var(--c-br)
+    box-shadow: 1px 0 0 $.br.a
 
   .grid.page
     grid-area: page
     overflow-y: auto
 
   .grid.side a
-    display: block
-    padding: 0 1rem
-    line-height: 2
-
-.tabs
-  .tabs-head
-    padding: 0 1rem
-    line-height: 4
-    box-shadow: 0 1px 0 var(--c-br)
-
-  .tab
-    display: none
-
-    &:target
-      padding: 1rem
-      display: block
-
-    legend, label, input
-      display: block
-      margin-bottom: 1em
-
-    legend
-      font-weight: bold
-      margin-bottom: 1em
-      text-transform: capitalize
-      text-decoration: underline
-
-    pre
-      padding: 1rem
-      border-radius: 3px
-      box-shadow: var(--brd-main)
-      white-space: pre-wrap
+    display: flex
+    padding: 0 1em
+    align-items: center
+    justify-content: space-between
 
