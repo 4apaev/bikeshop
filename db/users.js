@@ -1,22 +1,22 @@
 // @ts-check
-import query from './db.js'
+import query, { where } from './db.js'
 
 /** @typedef {import("./db.js").QRes} QRes */
 
 /**
  * @async
- * @prop {string} name
- * @prop {string} mail
- * @prop {string} pass
- * @return {Promise<QRes>}
+ * @prop { string } uname
+ * @prop { string } email
+ * @prop { string } pass
+ * @return { Promise<QRes> }
  */
-export function create({ name, mail, pass }) {
+export function create({ uname, email, pass }) {
   return query(`
   insert into users(uname, email, pass)
     values($1, $2, crypt($3, gen_salt('bf')))
     returning
-      id, uname, mail;
-  `, [ name, mail, pass ], 1)
+      id, uname, email;
+  `, [ uname, email, pass ], 1)
 }
 
 /**
@@ -36,24 +36,18 @@ export function get({ id }) {
 
 /**
  * @async
- * @prop {number} limit
+ * @prop {object} params
  * @return {Promise<QRes>}
  */
-export function list({ limit = 10 }) {
-  return query(`
-    select id, uname, email from users
-      limit
-        $1;
-  `, [ limit ])
-}
+export const list = where('users', 'id', 'uname', 'email')
 
 /**
  * @async
- * @prop {string} mail
+ * @prop {string} email
  * @prop {string} pass
  * @return {Promise<QRes>}
  */
-export function auth({ mail, pass }) {
+export function auth({ email, pass }) {
   return query(`
     select id, uname, email from users
       where
@@ -62,7 +56,6 @@ export function auth({ mail, pass }) {
         pass = crypt($2, pass)
       limit
         1;
-  `, [ mail, pass ], 1)
+  `, [ email, pass ], 1)
 }
-
 
