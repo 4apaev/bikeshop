@@ -1,40 +1,61 @@
-/* eslint-disable no-unused-vars */
+// @ts-check
+import Crypt from 'crypto'
 
 import {
-  createHmac,
-  randomBytes,
-  randomInt,
-  randomUUID,
-} from 'crypto'
+  Log,
+} from '../util/index.js'
 
-const { BIKESHOP_SECRET: secret } = process.cwd()
+const debug = Log.debug('jwt')
+
 const LNK = '.'
+const {
+  BIKESHOP_SECRET: secret,
+} = process.env
 
-export const rand = randomInt
-export const uuid = randomUUID
-export const bytes = randomBytes
-
-export function enc(s, e) /* btoa */ {
+/**
+ * @param  { string } s
+ * @param  { BufferEncoding } [e]
+ * @return { string }
+ */
+export function enc(s, e) {
   return Buffer.from(s).toString(e ?? 'base64')
 }
 
-export function dec(s, e) /* atob */ {
+/**
+ * @param  { WithImplicitCoercion<string>  } s
+ * @param  { BufferEncoding } [e]
+ * @return { string }
+ */
+export /* atob */ function dec(s, e) {
   return Buffer.from(s, e ?? 'base64').toString()
 }
 
-export function encode(o, e) {
+/**
+ * @param  { * } o
+ * @param  { BufferEncoding } [e]
+ * @return { string }
+ */
+export /* btoa */ function encode(o, e) {
   return enc(JSON.stringify(o), e)
 }
 
-export function decode(s, e) {
+/**
+ * @param { WithImplicitCoercion<string>  } s
+ * @param { BufferEncoding } [e]
+ */
+export /* atob */ function decode(s, e) {
   try {
     return JSON.parse(dec(s, e))
   }
   catch (_) {
-    return false
+    debug('[decode:Invalid JSON]', _)
   }
 }
 
+/**
+ * @param  { Object<string, *> } o
+ * @return { string }
+ */
 export function create(o) {
   const head = encode({ typ: 'jwt', alg: 'HS256' })
   const body = encode(o)
@@ -42,17 +63,45 @@ export function create(o) {
   return [ head, body, sig ].join(LNK)
 }
 
+/**
+ * @param { string } s
+ */
 export function verify(s) {
   if (typeof s != 'string' || s.length < 1)
-    return false
+    return
+
   const [ head, body, sig ] = s.split(LNK)
-  return sig === sign(head, body)
-    ? decode(body)
-    : false
+  if (sig === sign(head, body))
+    return decode(body)
 }
 
+/**
+ * @param {...string} a
+ * @return {string}
+ */
 export function sign(...a) {
-  return createHmac('SHA256', secret)
+  return Crypt.createHmac('SHA256', secret)
     .update(a.join(LNK))
     .digest('base64')
+}
+
+/** @type {import("koa").Middleware} */
+export function useAuth(ctx, next) {
+  const token = ctx.get('authorization')
+  if (token) {
+    const x = verify(token)
+    if (x) {
+      ctx.user = x
+      return next()
+    }
+    debug('signature mismatch', token)
+  }
+  else {
+    debug('no authorization header')
+  }
+
+  ctx.status = 401
+  ctx.type = 'text'
+  ctx.set('authorization', 'Basic realm="401"')
+  ctx.body = 'authentication required'
 }

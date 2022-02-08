@@ -1,23 +1,16 @@
-/* eslint-disable no-unused-vars */
 import {
   ok,
   deepStrictEqual as equal,
   notDeepStrictEqual as nope,
 } from 'assert'
+
+import Log from '../util/log.js'
 import * as jwt from '../wheels/jwt.js'
 
-/*
-
-create
-verify
-sign
-
-*/
 describe('Jwt', () => {
   it('enc/dec', () => {
     const a = 'doggo'
     const b = jwt.enc(a)
-
     ok(a !== b)
     ok(a === jwt.dec(b))
   })
@@ -25,25 +18,20 @@ describe('Jwt', () => {
   it('encode/decode', () => {
     const a = { type: 'doggo', name: 'shoshi' }
     const b = jwt.encode(a)
-
     equal(a, jwt.decode(b))
   })
 
   it('ok: create/verify', () => {
-    const a = { type: 'doggo', name: 'shoshi' }
+    const a = { type: 'dog', name: 'bob' }
     const b = jwt.create(a)
-
-
     equal(a, jwt.verify(b))
   })
 
   it('nope: create/verify', () => {
-    const a = { type: 'doggo', name: 'shoshi' }
-    const b = { type: 'doggo', name: 'jacko' }
-
-    const c = jwt.create(a)
-    const d = jwt.create(b)
-    nope(c, d)
+    nope(
+      jwt.create({ type: 'cat', name: 'alice' }),
+      jwt.create({ type: 'dog', name: 'bob'   }),
+    )
   })
 
   it('sign', () => {
