@@ -1,28 +1,31 @@
-/* eslint-disable no-unused-vars */
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
 import {
   Is,
-  Log,
 } from '../util/index.js'
+
+/** @typedef {import("koa").Context} Ctx */
+
+/** @typedef {import("koa").Middleware} MWare */
+
+/**
+ * @callback isRoute
+ * @param {Ctx} ctx
+ * @return {boolean}
+ */
 
 /**
  * @callback Route
  * @param { string | RegExp } url
- * @param { Koa.Middleware } cb
- */
-
-/**
- * @callback isRoute
- * @param {Koa.Context} ctx
- * @return {boolean}
+ * @param { MWare } cb
  */
 
 export default class Router extends Koa {
   /**
-   * @param { string | RegExp } url
-   * @param { Koa.Middleware } cb
+   * @type {Route}
+   * @param {string} url
+
    */
   get(url, cb) {
     this.mware('GET', url, cb)
@@ -30,7 +33,7 @@ export default class Router extends Koa {
 
   /**
    * @param { string | RegExp } url
-   * @param { Koa.Middleware } cb
+   * @param { MWare } cb
    */
   del(url, cb) {
     this.mware('DELETE', url, cb)
@@ -38,7 +41,7 @@ export default class Router extends Koa {
 
   /**
    * @param {string|RegExp} url
-   * @param {Koa.Middleware} cb
+   * @param {MWare} cb
    */
   put(url, cb) {
     this.mware('PUT', url, cb)
@@ -46,7 +49,7 @@ export default class Router extends Koa {
 
   /**
    * @param {string|RegExp} url
-   * @param {Koa.Middleware} cb
+   * @param {MWare} cb
    */
   post(url, cb) {
     this.mware('POST', url, cb)
@@ -54,14 +57,14 @@ export default class Router extends Koa {
 
   /**
    * @param {string|RegExp} url
-   * @param {Koa.Middleware} cb
+   * @param {MWare} cb
    */
   patch(url, cb) {
     this.mware('PATCH', url, cb)
   }
 
   mware() {
-    /** @type {Koa.Middleware} */
+    /** @type {MWare} */
     let cb
 
     /** @type {isRoute[]} */
@@ -80,7 +83,7 @@ export default class Router extends Koa {
     // @ts-ignore
     Is.assert.f(cb, 'missing route callback')
 
-    this.use(/** @type {Koa.Middleware} */ (ctx, next) =>
+    this.use(/** @type {MWare} */ (ctx, next) =>
       argv.every(fn => fn(ctx))
         ? cb(ctx, next)
         : next())
@@ -114,4 +117,3 @@ function isHttpMethod(x) {
   return Http.METHODS.includes(x.toUpperCase())
 }
 
-Log(rxpath('/define.js'))
