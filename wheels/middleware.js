@@ -1,9 +1,9 @@
 // @ts-check
 import * as Mim from './mim.js'
-import * as Jwt from './jwt.js'
 import { Log } from '../util/index.js'
 
-/** @typedef {import("koa").Middleware} Middleware */
+/** @typedef {import("koa").Context} Ctx */
+/** @typedef {import("koa").Middleware} MWare */
 
 // @ts-ignore
 const debug = Log.debug('middleware')
@@ -15,33 +15,14 @@ export const methods = new Set([
   'DELETE',
 ])
 
-/** @type {Middleware} */
-export function useAuth(ctx, next) {
-  const token = ctx.get('authorization')
-  if (token) { // eslint-disable-next-line no-cond-assign
-    if (ctx.user = Jwt.verify(token))
-      return next()
-    else
-      debug('signature mismatch', token)
-  }
-  else {
-    debug('no authorization header')
-  }
-
-  ctx.status = 401
-  ctx.type = 'text'
-  ctx.set('authorization', 'Basic realm="401"')
-  ctx.body = 'authentication required'
-}
-
-/** @type {Middleware} */
+/** @type {MWare} */
 export async function logger(ctx, next) {
   const start = Date.now()
   await next()
-  console.log('%d %s %s %s', ctx.status, ctx.method, ctx.path, Date.now() - start)
+  Log('%d %s %s %s', ctx.status, ctx.method, ctx.path, Date.now() - start)
 }
 
-/** @type {Middleware} */
+/** @type {MWare} */
 export async function reqPayload(ctx, next) {
   if (!methods.has(ctx.method))
     return next()
@@ -55,7 +36,7 @@ export async function reqPayload(ctx, next) {
   return parsePayload(ctx, next)
 }
 
-/** @type {Middleware} */
+/** @type {MWare} */
 function parsePayload(ctx, next) {
   if (!ctx.is(Mim.json))
     return next()
