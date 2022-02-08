@@ -3,14 +3,12 @@ import query, { where } from './db.js'
 
 /** @typedef {import("./db.js").QRes} QRes */
 
-
 /**
  * @async
  * @prop {string} kind
  * @prop {string} details
  * @return {Promise<QRes>}
  */
-
 export function create({ kind, details }) {
   return query(`insert into bikes(kind, details) values($1, $2) returning *;`, [ kind, details ?? '' ], 1)
 }
@@ -26,7 +24,9 @@ export function get({ id }) {
 
 /**
  * @async
- * @prop {object} params
+ * @prop {?string} [kind]
+ * @prop {?string} [details]
+ * @prop {?number} [limit = 10]
  * @return {Promise<QRes>}
  */
 export const list = where('bikes', 'id', 'kind', 'details')

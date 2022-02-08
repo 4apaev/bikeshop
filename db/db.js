@@ -7,6 +7,19 @@ import Log from '../util/log.js'
 
 import { pgconf } from '../config/config.js'
 
+/**
+ * @callback QWhere
+ * @param {Object<string, *>} props
+ * @param {number} [limit=10]
+ */
+
+/**
+ * @typedef {Object} QRes
+ * @prop {pg.DatabaseError?} error
+ * @prop {pg.QueryResult} result
+ * @prop {?} value
+ */
+
 const debug = Log.debug('db')
 export const pool = new pg.Pool(pgconf)
 
@@ -15,10 +28,10 @@ pool.on('remove', () => debug('[pool] client removed'))
 pool.on('error', e => debug(`[pool:error]`, e))
 
 /**
- * @param {string | pg.QueryArrayConfig<any>} sql
+ * @param {string | pg.QueryArrayConfig<*>} sql
  * @param {*[]} params
  * @param {1|true} [single]
- * @returns {Promise<QRes>}
+ * @return {Promise<QRes>}
  */
 export default async function query(sql, params, single) {
   let error, result
@@ -43,11 +56,12 @@ export default async function query(sql, params, single) {
 /**
  * @param {string} table
  * @param {...string} keys
+ * @return {QWhere}
  */
 export function where(table, ...keys) {
   const head = `select ${ keys.join(', ') } from ${ table }`
 
-  return /** @type {QWhere} */ (props, limit = 10) => {
+  return (props, limit) => {
     let i = 0
     let params = []
     let values = []
@@ -61,20 +75,8 @@ export function where(table, ...keys) {
     }
 
     params.length && q.push('where', params.join(`\n  and\n`))
-    q.push(`limit ${ limit };`)
+    q.push(`limit ${ limit ?? props.limit ?? 10 };`)
     return query(q.join(`\n  `), values)
   }
 }
 
-/**
- * @callback QWhere
- * @param {Object<string, *>} props
- * @param {number} [limit=10]
- */
-
-/**
- * @typedef {Object} QRes
- * @prop {pg.DatabaseError?} error
- * @prop {pg.QueryResult} result
- * @prop {?} value
- */
