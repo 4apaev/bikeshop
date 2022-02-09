@@ -28,28 +28,19 @@ export function sanitizePath(x) {
   }, []).join('/')
 }
 
-export function pipe(...fns) {
-  return prev =>
-    fns.reduce((prev, next) =>
-      next(prev), prev)
+export function tmpl(s, a, cb = x => x) {
+  for (var i = 0, re = [ s.raw[ i ] ]; i < a.length;)
+    re = re.concat(cb(a[ i++ ]), s.raw[ i ])
+  return re
 }
 
-export function compose(...fns) {
-  return prev =>
-    fns.reduceRight((prev, next) =>
-      next(prev), prev)
-}
+tmpl.raw = (s, ...a) => tmpl(s, a).join('')
 
-export function bind(fn, when, strategy) {
-  const i = when == 'after'
-  const argv = strategy == 'merge'
-    ? (a, b) => a.map((x, i) => b[ i ] ?? x)
-    : (a, b) => a.concat(b)
-
-  return (...a) => (...b) => {
-    const ctx = [ a, b ][ +i  ].shift()
-    return fn.apply(ctx, argv(a, b))
-  }
+export function rxpath(s) {
+  return new RegExp(s
+    .replace(/:(\w+)/g, `(?<$1>w+)`)
+    .replace(/(?<!\\)\//g, `\\/`)
+    .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
 }
 
 O.use(Array, {
