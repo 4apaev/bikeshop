@@ -1,7 +1,13 @@
-import Path from 'path'
 export const CT = 'content-type'
 export const CL = 'content-length'
 export const mime = init()
+
+/**
+ * @callback stringer
+ * @param  { string | URL } file
+ * @param  {?string } [fallback]
+ * @return { string }
+ */
 
 export function get(x, fallback = x) {
   return mime[ x ] ?? fallback
@@ -26,12 +32,27 @@ export function fromHead(x, fallback = '') {
  * @return {string}
  */
 export function fromFile(file, fallback = '') {
-  if (file instanceof URL)
-    file = file.pathname
-  const ex = Path.extname(file).slice(1)
+  const ex = extname(file)
   return ex
     ? get(ex, fallback)
     : fallback
+}
+
+/**
+ * @param {string|URL} file
+ * @param {string} [fallback]
+ * @return {string}
+ */
+export function extname(file, fallback = '') {
+  if (file instanceof URL)
+    file = file.pathname
+
+  let ex = ''
+  for (let i = file.length; i--;) {
+    if (file[ i ] == '.') break
+    ex = file[ i ] + ex
+  }
+  return ex || fallback
 }
 
 function init() {
