@@ -40,13 +40,13 @@ export /** @type {Middleware} */ const create = respond(User.create, {
   msg: 'fail to create user',
   before(ctx) { // @ts-ignore
     return {
-      name: ctx?.payload?.name ?? ctx?.payload?.uname,
-      mail: ctx?.payload?.mail ?? ctx?.payload?.email,
-      pass: ctx?.payload?.pass ?? ctx?.payload?.password,
+      uname: ctx.payload?.uname,
+      email: ctx.payload?.email,
+      pass: ctx.payload?.pass,
     }
   },
   validate(o) {
-    return validate(o, [ 'name', 'mail', 'pass' ])
+    return validate(o, [ 'uname', 'email', 'pass' ])
   },
 })
 
@@ -55,7 +55,7 @@ export /** @type {Middleware} */ const auth = respond(User.auth, {
   msg: 'fail to auth user',
   after: createToken,
   validate(o) {
-    return validate(o, [ 'mail', 'pass' ])
+    return validate(o, [ 'email', 'pass' ])
   },
 })
 
