@@ -15,7 +15,6 @@ import { Log } from '../util/index.js'
  * @prop {function} [debug]
  */
 
-
 /**
  * @param {{(payload: *): Promise<QRes> }} fn
  * @param {Opts} opt
@@ -31,7 +30,9 @@ export default function respond(fn, opt) {
     ctx.type = 'json'
 
     let payload = before(ctx)
-    let message = check(payload)
+    let message = check
+      ? check(payload)
+      : null
 
     if (message) {
       ctx.status = 400
@@ -45,7 +46,8 @@ export default function respond(fn, opt) {
       result,
     } = await fn(payload)
 
-    if (error || !value) {
+    // TODO return better response for 404 (no value in not an rror!)
+    if (error) {
       ctx.status = error
         ? code
         : 404
@@ -66,5 +68,3 @@ export default function respond(fn, opt) {
     }
   }
 }
-
-
