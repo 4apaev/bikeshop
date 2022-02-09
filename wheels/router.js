@@ -1,31 +1,14 @@
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
-import {
-  Is,
-} from '../util/index.js'
+import { O, Is, Log } from '../util/index.js'
 
-/** @typedef {import("koa").Context} Ctx */
-
-/** @typedef {import("koa").Middleware} MWare */
-
-/**
- * @callback isRoute
- * @param {Ctx} ctx
- * @return {boolean}
- */
-
-/**
- * @callback Route
- * @param { string | RegExp } url
- * @param { MWare } cb
- */
+const debug = Log.debug('router')
 
 export default class Router extends Koa {
   /**
-   * @type {Route}
-   * @param {string} url
-
+   * @param { string | RegExp } url
+   * @param { Koa.Middleware } cb
    */
   get(url, cb) {
     this.mware('GET', url, cb)
@@ -33,41 +16,41 @@ export default class Router extends Koa {
 
   /**
    * @param { string | RegExp } url
-   * @param { MWare } cb
+   * @param { Koa.Middleware } cb
    */
   del(url, cb) {
     this.mware('DELETE', url, cb)
   }
 
   /**
-   * @param {string|RegExp} url
-   * @param {MWare} cb
+   * @param { string|RegExp } url
+   * @param { Koa.Middleware } cb
    */
   put(url, cb) {
     this.mware('PUT', url, cb)
   }
 
   /**
-   * @param {string|RegExp} url
-   * @param {MWare} cb
+   * @param { string|RegExp } url
+   * @param { Koa.Middleware } cb
    */
   post(url, cb) {
     this.mware('POST', url, cb)
   }
 
   /**
-   * @param {string|RegExp} url
-   * @param {MWare} cb
+   * @param { string|RegExp } url
+   * @param { Koa.Middleware } cb
    */
   patch(url, cb) {
     this.mware('PATCH', url, cb)
   }
 
   mware() {
-    /** @type {MWare} */
+    /** @type { Koa.Middleware } */
     let cb
 
-    /** @type {isRoute[]} */
+    /** @type { isRoute[] } */
     const argv = []
 
     for (const a of arguments) {
@@ -83,7 +66,7 @@ export default class Router extends Koa {
     // @ts-ignore
     Is.assert.f(cb, 'missing route callback')
 
-    this.use(/** @type {MWare} */ (ctx, next) =>
+    this.use(/** @type {Koa.Middleware} */ (ctx, next) =>
       argv.every(fn => fn(ctx))
         ? cb(ctx, next)
         : next())
@@ -91,8 +74,8 @@ export default class Router extends Koa {
 }
 
 /**
- * @param {string} str
- * @return {isRoute}
+ * @param { string } str
+ * @return { isRoute }
  */
 export function rxpath(str) {
   const rx = new RegExp(str
@@ -100,20 +83,27 @@ export function rxpath(str) {
     .replace(/(?<!\\)\//g, `\\/`)
     .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
 
-  return ctx => {
-    for (const x of ctx.path.matchAll(rx)) {
-      ctx.params = x?.groups ?? {}
-      return true
+  return ctx => { // @ts-ignore
+    let  ok; let params = O.o
+    for (const { groups } of ctx.path.matchAll(rx)) {
+      ok ??= true
+      groups && O.each(groups, O.merge, params)
     }
-    return false
+    ok && debug('[ctx.params]', ctx.params = params)
+    return !!ok
   }
 }
 
 /**
- * @param {string} x
- * @return {boolean}
+ * @param { string } x
+ * @return { boolean }
  */
 function isHttpMethod(x) {
   return Http.METHODS.includes(x.toUpperCase())
 }
 
+/**
+ * @callback isRoute
+ * @param {Koa.Context} ctx
+ * @return {boolean}
+ */
