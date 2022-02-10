@@ -1,7 +1,3 @@
-/* eslint-disable no-unused-vars */
-import $ from '/js/dom.js'
-import Sync from '/js/Sync.js'
-
 export default class Home extends HTMLElement {
 
   uid = crypto.randomUUID().replace(/^[\d-]+/, '')

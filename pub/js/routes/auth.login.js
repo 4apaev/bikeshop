@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import $ from '/js/dom.js'
-import Sync from '/js/Sync.js'
+import Sync from '/js/sync.js'
+
 import Auth from '/js/routes/user.create.js'
 
 export default class Login extends Auth {

@@ -1,16 +1,13 @@
-/* eslint-disable no-unused-vars */
-import $ from '/js/dom.js'
-import Sync from '/js/Sync.js'
+import Table from '/js/routes/table.js'
 
-export default class Scheduler extends HTMLElement {
-  uid = crypto.randomUUID().replace(/^[\d-]+/, '')
-  connectedCallback() {
-    this.html`
-      <section class="${ this.uid }">
-        <h2>Scheduler</h2>
-      </section>
-    `
-  }
+export default class Scheduler extends Table {
+
+  slug = 'scheduler'
+  title = 'Scheduler'
+  cells = [ 'uid', 'bid', 'checkin', 'checkout' ]
+  apiUrl = `/api/user-bikes`
+  createRoute = `/app/scheduler/create`
 }
 
-customElements.define('ws-scheduler', Scheduler)
+Scheduler.define()
+
