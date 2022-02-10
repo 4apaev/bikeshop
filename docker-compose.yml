@@ -1,7 +1,7 @@
-version: "3"
 services:
 
   bikeshop:
+    image: node:alpine
     container_name: bikeshop
     env_file: .env
     build: .
@@ -12,6 +12,7 @@ services:
     networks:
       - public
       - private
+
   db:
     container_name: db
     image: postgres:alpine
@@ -23,15 +24,20 @@ services:
       - db-data:/var/lib/postgresql
     networks:
       - private
-  # pgadmin:
-  #   container_name: pgadmin
-  #   image: dpage/pgadmin4:latest
-  #   env_file: .env
-  #   depends_on:
-  #     - db
-  #   ports:
-  #     - 5050:80
-  #   restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - 5050:80
+    restart: always
+    networks:
+      - public
+      - private
+
 networks:
   public:
   private:
