@@ -1,10 +1,8 @@
 // @ts-check
-
 import * as User from '../db/users.js'
 import { Log } from '../util/index.js'
 import { create as createToken } from '../wheels/jwt.js'
 import respond from './respond.js'
-
 
 /** @typedef {import("koa").Middleware} Middleware */
 
@@ -14,24 +12,19 @@ export /** @type {Middleware} */ const get = respond(User.get, {
   debug,
   msg: 'user not found',
   before(ctx) {
-    return { id: ctx.URL.searchParams.get('id') }
+    return { id: ctx?.params?.id }
   },
 
-  validate(o) {
-    return validate(o, [ 'id' ])
-  },
 })
 
-export /** @type {Middleware} */ const query = respond(User.list, {
+export /** @type {Middleware} */ const list = respond(User.list, {
   debug,
   msg: 'user not found',
   before(ctx) { // @ts-ignore
-    let limit = parseInt(ctx.URL.searchParams.get('limit')) || 10
-    return { limit }
-  },
-
-  validate() {
-    return true
+    const o = ctx.URL.searchParams
+    return o
+      ? Object.fromEntries(o)
+      : { limit: 10 }
   },
 })
 
@@ -58,7 +51,6 @@ export /** @type {Middleware} */ const auth = respond(User.auth, {
     return validate(o, [ 'email', 'pass' ])
   },
 })
-
 
 /**
  * @param {{ [x: string]: string; }} o

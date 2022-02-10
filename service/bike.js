@@ -1,4 +1,5 @@
 // @ts-check
+import Koa from 'koa'
 
 const Kind = new Set([
   'city',
@@ -10,32 +11,32 @@ const Kind = new Set([
   'fixie',
 ])
 
-
 import * as Bike from '../db/bikes.js'
 import { Log } from '../util/index.js'
 import respond from './respond.js'
 
-
-/** @typedef {import("koa").Middleware} Middleware */
-
 const debug = Log.debug('[service:bikes]')
 
-export /** @type {Middleware} */ const get = respond(Bike.get, {
+export /** @type {Koa.Middleware} */ const get = respond(Bike.get, {
   debug,
   msg: 'bike not found',
   before(ctx) {
-    const id = new URL(ctx.url, 'file:').searchParams.get('id')
-    return { id }
-  },
-
-  /** @param {{ id: string; }} o */
-  validate(o) {
-    if (typeof o.id != 'string')
-      return `invalid prop: bike: "id"`
+    return { id: +ctx.path.split('/').pop() }
   },
 })
 
-export /** @type {Middleware} */ const create = respond(Bike.create, {
+export /** @type {Koa.Middleware} */ const list = respond(Bike.list, {
+  debug,
+  msg: 'bike not found',
+  before(ctx) {
+    const o = ctx.URL.searchParams
+    return o
+      ? Object.fromEntries(o)
+      : { limit: 10 }
+  },
+})
+
+export /** @type {Koa.Middleware} */ const create = respond(Bike.create, {
   debug,
   msg: 'fail to create bike',
 
