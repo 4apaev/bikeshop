@@ -1,4 +1,4 @@
-import $ from './dom.js'
+import $ from '/js/dom.js'
 
 export function push(path, data) {
   history.pushState(data, data?.title, path)
@@ -29,7 +29,7 @@ export default class Router extends HTMLElement {
 
     const src = route.get('src')
     const props = url.searchParams
-      ? O.from(url.searchParams)
+      ? Object.fromEntries(url.searchParams)
       : {}
 
     if (src)
