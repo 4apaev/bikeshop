@@ -3,9 +3,3 @@ extends:
 
 env:
   browser: true
-
-globals:
-  $: true
-  O: true
-  log: true
-  Log: true
