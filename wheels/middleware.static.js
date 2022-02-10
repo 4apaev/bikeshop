@@ -5,11 +5,12 @@ import {
 } from 'fs/promises'
 import Path from 'path'
 import Styl from 'stylus'
+import Koa from 'koa'
 import {
   Log,
   sanitizePath,
 } from '../util/index.js'
-import * as Mim from './mim.js'   // @ts-ignore
+import * as Mim from '../util/mim.js'
 const debug = Log.debug('static')
 
 /** @typedef {import("koa").Context} Context */
@@ -22,7 +23,7 @@ const debug = Log.debug('static')
 export function statiq(base, dict) {
   base ??= process.cwd()
   dict ??= { '/': '/index.html' }
-  return /** @type {Middleware} */ ctx => {
+  return /** @type {Koa.Middleware} */ ctx => {
     let path = sanitizePath(ctx.path)
     return sendFile(ctx, Path.join(base, dict[ path ] ?? path))
   }
@@ -32,12 +33,12 @@ export function statiq(base, dict) {
  * @param {string} file
  */
 export function send(file) {
-  return /** @type {Middleware} */ ctx =>
+  return /** @type {Koa.Middleware} */ ctx =>
     sendFile(ctx, file)
 }
 
 /**
- * @param {Context} ctx
+ * @param {Koa.Context} ctx
  * @param {string} file
  */
 export async function sendFile(ctx, file) {
