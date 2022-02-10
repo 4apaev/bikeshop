@@ -1,10 +1,8 @@
-/* eslint-disable no-unused-vars */
-
 import { Log } from './util/index.js'
 import Router from './wheels/router.js'
 import * as User from './service/user.js'
 import * as Bike from './service/bike.js'
-
+import * as UBike from './service/user.bikes.js'
 
 import {
   logger,
@@ -23,19 +21,24 @@ const app = new Router
 
 app.use(logger)
 
-app.get(/\/api\/user/, User.get)
-app.get(/\/api\/bike/, Bike.get)
+app.get('/api/user-bikes/:uid-:bid$', UBike.get)
+app.get('/api/users/:id$',            User.get)
+app.get('/api/bikes/:id$',            Bike.get)
 
-app.get('/Sync.js', send('./node_modules/sync/src/Fetch.js'))
-app.get('/Base.js', send('./node_modules/sync/src/Base.js'))
-app.get('/Mim.js', send('./node_modules/sync/src/Mim.js'))
-app.get('/define.js', send('./util/define.js'))
-
-app.get(statiq('./pub'))
+app.get('/api/user-bikes', UBike.list)
+app.get('/api/users',      User.list)
+app.get('/api/bikes',      Bike.list)
 
 app.post(reqPayload)
-app.post('/api/user/auth', User.auth)
-app.post('/api/user', User.create)
-app.post('/api/bike', Bike.create)
+
+app.post('/api/user-bikes', UBike.create)
+app.post('/api/users',      User.create)
+app.post('/api/bikes',      Bike.create)
+
+// static
+app.get(`/app/.*`,    send('./pub/index.html'))
+
+app.get('/util/*', statiq())
+app.get(statiq('./pub'))
 
 app.listen(port, () => debug('Server started on port', port))

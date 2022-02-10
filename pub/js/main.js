@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import $ from './dom.js'
 
 export function edit() {
   const ico = $('#icon')
@@ -14,7 +15,6 @@ export function edit() {
   const color = dialog.$('[name=color]')
   const round = dialog.$('#round')
   const reset = dialog.$('#reset')
-
 
   color.on('input', e => {
     curr?.attr?.({ fill: e.target.value })
@@ -36,10 +36,7 @@ export function edit() {
     color.value = curr.attr('fill')
   })
 
-
-
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(edit, 100)

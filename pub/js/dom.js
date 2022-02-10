@@ -1,5 +1,5 @@
-import O from '../define.js'
-import is from './is.js'
+import O from '/util/define.js'
+import is from '/util/is.js'
 
 const µ = null
 const A = Array

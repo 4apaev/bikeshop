@@ -1,5 +1,5 @@
 import $ from '/js/dom.js'
-import Sync from '/js/Sync.js'
+import Sync from '/js/sync.js'
 import Base from '/js/comp/base.js'
 
 const µ = undefined

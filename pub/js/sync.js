@@ -1,37 +1,9 @@
 // @ts-check
 
-import is from './is.js'
-
-export const Mim = {
-  css: 'text/css',
-  txt: 'text/plain',
-  html: 'text/html',
-  js: 'application/javascript',
-  xml: 'application/xml',
-  json: 'application/json',
-  form: 'multipart/form-data',
-  query: 'application/x-www-form-urlencoded',
-  gif: 'image/gif',
-  jpg: 'image/jpeg',
-  png: 'image/png',
-  svg: 'image/svg+xml',
-
-  get(x) {
-    return this[ x ] || x
-  },
-
-  ext(x) {
-    return this[ x.split('.').pop() ] || this.txt
-  },
-
-  is(x, head) {
-
-    const ct = is.s(head)
-      ? head
-      : head?.get?.('content-type') ?? head?.[ 'content-type' ] ?? ''
-    return ct.toLowerCase().includes(this[ x ] ?? x)
-  },
-}
+// @ts-ignore
+import is from '/util/is.js'
+// @ts-ignore
+import * as Mim from '/util/mim.js'
 
 /**
  * @typedef {Object} Payload
@@ -245,4 +217,3 @@ export default class Sync {
     return new Sync('delete', url).send(body)
   }
 }
-

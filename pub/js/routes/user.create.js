@@ -1,4 +1,5 @@
-import Sync from '/js/Sync.js'
+import $ from '/js/dom.js'
+import Sync from '/js/sync.js'
 
 export default class Auth extends HTMLElement {
   uid = crypto.randomUUID().replace(/^[\d-]+/, '')
@@ -63,7 +64,7 @@ export default class Auth extends HTMLElement {
 
   send() {
     const form = this.$('form')
-    return Sync.post('/api/user', {
+    return Sync.post('/api/users', {
       uname: form.uname.value,
       email: form.email.value,
       pass: form.pass.value,
@@ -89,7 +90,9 @@ export default class Auth extends HTMLElement {
     this.$('.send').set('disabled', true)
 
     try {
-      await this.send()
+      const re = await this.send()
+      this.emit('fetch', re.body)
+      history.replaceState({}, 'some', location.pathname)
     }
     catch (err) {
       this.show(err?.message ?? err?.body?.message ?? 'Error', 1)

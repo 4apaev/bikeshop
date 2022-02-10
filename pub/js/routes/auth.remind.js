@@ -1,4 +1,4 @@
-import Sync from '/js/Sync.js'
+import Sync from '/js/sync.js'
 import Auth from '/js/routes/user.create.js'
 
 export default class Remind extends Auth {
