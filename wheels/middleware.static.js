@@ -13,9 +13,6 @@ import {
 import * as Mim from '../util/mim.js'
 const debug = Log.debug('static')
 
-/** @typedef {import("koa").Context} Context */
-/** @typedef {import("koa").Middleware} Middleware */
-
 /**
  * @param {string} [base]
  * @param {{ [x: string]: string; }} [dict]
@@ -61,7 +58,7 @@ export async function sendFile(ctx, file) {
     ctx.lastModified = stat.mtime
   }
   catch (e) {
-    debug('[not found]', e)
+    debug('not found', e.message)
     ctx.status = 404
     ctx.body = `<h1>${ e }</h1>`
     ctx.type = 'html'
@@ -69,7 +66,7 @@ export async function sendFile(ctx, file) {
 }
 
 /**
- * @param {Context} ctx
+ * @param {Koa.Context} ctx
  * @param {Fs.Stats} stat
  * @return {boolean}
  */
