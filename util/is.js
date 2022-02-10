@@ -1,3 +1,4 @@
+// @ts-check
 import Fail, { raise, assert } from './fail.js'
 
 const A = Array
@@ -13,18 +14,18 @@ export default function Is(a, b, m) {
     : c == a)
 }
 
-Is.u = use('null or undefined', x => x != µ)
-Is.a = use('array', x => Array.isArray(x))
-Is.n = use('number', x => Number.isFinite(x))
-Is.i = use('integer', x => Number.isInteger(x))
-Is.s = use('string', x => typeof x == 'string')
-Is.b = use('boolean', x => typeof x == 'boolean')
-Is.f = use('function', x => typeof x == 'function')
-Is.o = use('object', x => typeof x == 'object' && !!x)
-Is.O = use('Object', x => T(x) == 'Object')
-Is.I = use('iterable', x => Symbol.iterator in O(x))
-Is.X = use('complexity', x => x === O(x))
-Is.raw = use('template', x => Array.isArray(x?.raw))
+Is.u = use('null',        /** @type {isu} */ x => x != µ)
+Is.a = use('array',       /** @type {isa} */ x => Array.isArray(x))
+Is.n = use('number',      /** @type {isn} */ x => Number.isFinite(x))
+Is.i = use('integer',     /** @type {isi} */ x => Number.isInteger(x))
+Is.s = use('string',      /** @type {iss} */ x => typeof x == 'string')
+Is.b = use('boolean',     /** @type {isb} */ x => typeof x == 'boolean')
+Is.f = use('function',    /** @type {isf} */ x => typeof x == 'function')
+Is.o = use('object',      /** @type {iso} */ x => typeof x == 'object' && !!x)
+Is.O = use('Object',      /** @type {isO} */ x => T(x) == 'Object')
+Is.I = use('iterable',    /** @type {isI} */ x => Symbol.iterator in O(x))
+Is.X = use('complexity',  /** @type {isX} */ x => x === O(x))
+Is.raw = use('template',  /** @type {israw} x */ x => Array.isArray(x?.raw))
 Is.eq = use('equality', function eql(a, b) {
   if (a === b) return true
   let t = T(a)
@@ -36,6 +37,11 @@ Is.eq = use('equality', function eql(a, b) {
 
 //////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @param {string} name
+ * @param {function} fn
+ * @return {isIt}
+ */
 export function use(name, fn) {
   assert(typeof fn == 'function', `[is.use]: not a function "${ name }"`)
   const i = fn.length
@@ -53,6 +59,13 @@ Is.complex = Is.x = Is.X
 
 //////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @param {string} m
+ * @param {string} name
+ * @param {boolean} x
+ * @throws {Fail}
+ * @return {boolean}
+ */
 function It(m, name, x) {
   const { not = false, fail = false } = It
   It.not  =  It.fail  = false
@@ -91,3 +104,96 @@ T.args = (args, cb = T, prev = {}) => {
   return prev
 }
 
+/** @type {<T, K extends keyof T>(obj: T, params: K[]) => Array<T[K]>} */
+
+/**
+ * @callback check
+ * @param {*} x
+ * @return {boolean}
+ */
+
+/**
+ * @callback withMessage
+ * @param {*} x
+ * @param {string=} m
+ * @return {boolean}
+ */
+
+/**
+ * @callback isIt
+ * @param {*} x
+ * @param {string=} m
+ * @return {boolean}
+ */
+
+/**
+ * @callback isu
+ * @param {*} x
+ * @return {x is !undefined}
+ */
+
+/**
+ * @callback isa
+ * @param {*} x
+ * @return {x is Array}
+ */
+
+/**
+ * @callback isn
+ * @param {*} x
+ * @return {x is number}
+ */
+
+/**
+ * @callback isi
+ * @param {*} x
+ * @return {x is number}
+ */
+
+/**
+ * @callback iss
+ * @param {*} x
+ * @return {x is string}
+ */
+
+/**
+ * @callback isb
+ * @param {*} x
+ * @return {x is boolean}
+ */
+
+/**
+ * @callback isf
+ * @param {*} x
+ * @return {x is function}
+ */
+
+/**
+ * @callback iso
+ * @param {*} x
+ * @return {x is object}
+ */
+
+/**
+ * @callback isO
+ * @param {*} x
+ * @return {x is Object}
+ */
+
+/**
+ * @callback isI
+ * @param {*} x
+ * @return {x is Iterable}
+ */
+
+/**
+ * @callback isX
+ * @param {*} x
+ * @return {x is (object | function)}
+ */
+
+/**
+ * @callback israw
+ * @param {*} x
+ * @return {x is TemplateStringsArray}
+ */
