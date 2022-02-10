@@ -1,9 +1,7 @@
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
-import { O, Is, Log } from '../util/index.js'
-
-const debug = Log.debug('router')
+import { O, Is } from '../util/index.js'
 
 export default class Router extends Koa {
   /**
@@ -89,7 +87,6 @@ export function rxpath(str) {
       ok ??= true
       groups && O.each(groups, O.merge, params)
     }
-    ok && debug('[ctx.params]', ctx.params = params)
     return !!ok
   }
 }
