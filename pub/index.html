@@ -11,14 +11,14 @@
   <link rel=stylesheet type="text/css" href="/css/main.styl">
 
   <script type="module">
-    import O from '/define.js'
+    import O from '/util/define.js'
     import $ from '/js/dom.js'
-    import Sync from '/js/Sync.js'
+    import Sync from '/js/sync.js'
 
     const Log = O.use(console.log.bind(console), console)
     Log.c = (c, ...a) => Log('%c%s', `color: ${ c }`, ...a)
 
-    O.assign(globalThis, { O, $, Sync, Log, log: Log })
+    O.mix(globalThis, { O, $, Sync, Log, log: Log })
   </script>
 </head>
 
