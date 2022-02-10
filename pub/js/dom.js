@@ -14,7 +14,7 @@ export default function JQ(q, el = doc, cb) {
     cb = el, el = doc
   return /^\++/.test(q) || is.f(cb)
     ? A.from(el.querySelectorAll(q.replace(/^\++/, '')), cb)
-    : el.querySelectorAll(q)
+    : el.querySelector(q)
 }
 
 O.use(JQ, {
