@@ -1,24 +1,33 @@
-import Is, { T } from './is.js'
+
+import Is, { T, raise } from './is.js'
 
 const µ = null
 const O = Object
 
 export default function use() {
-  if (arguments.length < 2)
-    return O(arguments[ 0 ] ?? µ)
+  if (arguments.length < 2) return O(arguments[ 0 ] ?? µ)
+  let [[ c, e, w ], target ] = T.args(arguments, Is.X, [[], []])
 
-  let [[ c, e, w ], [ a, b ]] = T.args(arguments, Is.X, [[], []])
+  const src = O.getOwnPropertyDescriptors(target.pop())
+  /*     */ src || raise('[use] missing source')
+  target.length || raise('[use] missing target')
 
-  Is.assert.X(a, 'use:trg')
-  Is.assert.X(b, 'use:src')
-
-  for (let k in b = get(b)) {
-    b[ k ].get ?? (
-      w != µ && (b[ k ].writable = w))
-    e != µ && (b[ k ].enumerable = e)
-    c != µ && (b[ k ].configurable = c)
+  for (let k in src) {
+    (src[ k ].get ?? (
+      w != µ && (src[ k ].writable = w)))
+    e != µ && (src[ k ].enumerable = e)
+    c != µ && (src[ k ].configurable = c)
   }
-  return O.defineProperties(a, b)
+
+  for (const trg of target)
+    O.defineProperties(trg, src)
+  return target[ 0 ]
+}
+
+export function def(a, b, c) {
+  return c
+    ? O.defineProperty(a, b, c)
+    : O.defineProperties(a, b)
 }
 
 export function get(a, b) {
@@ -27,22 +36,33 @@ export function get(a, b) {
     : O.getOwnPropertyDescriptors(a)
 }
 
+/**
+ * @example
+ * alias(src, key)
+ * alias(src,  ...props)
+ * alias(src, ...trg, ...props)
+ */
 export function alias() {
-  const props = []
-  const targets = []
-  T.args(arguments, Is.X, [ props, targets ])
+  const [ props, target ] = T.args(arguments, Is.X, [[], []])
 
   const key = props.shift()
-  const src = targets.shift()
-  const desc = get(src, key)
+  const src = target.shift()
 
-  props.length || props.push(key)
-  targets.length || targets.push(src)
+  key || raise('[alias] not found')
+  src || raise('[alias] source not found')
 
-  for (let a of props) {
-    for (let trg of targets)
-      O.defineProperty(trg, a, desc)
-  }
+  const desc = O.getOwnPropertyDescriptor(src, key)
+
+  if (props.length === 0)
+    target.forEach(trg => O.defineProperty(trg, key, desc))
+
+  else if (target.length === 0)
+    props.forEach(p => O.defineProperty(src, p, desc))
+
+  else
+    props.forEach(p => target.forEach(trg => O.defineProperty(trg, p, desc)))
+
+  return desc
 }
 
 export function each(a, cb, prev) {
@@ -55,20 +75,35 @@ export function each(a, cb, prev) {
   return prev
 }
 
-alias(O, use, 'create')
-alias(O, use, 'assign', 'assign', 'mix')
-alias(O, use, 'defineProperty', 'define', 'def')
-alias(O, use, 'defineProperties', 'defines')
-alias(O, use, 'getOwnPropertyNames', 'names')
-alias(O, use, 'keys')
-alias(O, use, 'values')
-alias(O, use, 'entries')
-alias(O, use, 'fromEntries', 'fromEntries', 'too')
-alias(O, use, 'hasOwn', 'own')
+export function merge(v, k, params) {
+  if (k in params) {
+    if (Is.a(params[ k ]))
+      params[ k ].push(v)
+    else
+      params[ k ] = v
+  }
+  else {
+    params[ k ] = v
+  }
+  return params
+}
 
-use(use, {
-  use, get, each, alias,
+use.use   = O.use   = use
+use.get   = O.get   = get
+use.each  = O.each  = each
+use.alias = O.alias = alias
+use.merge = O.merge = merge
 
+export const mix = use.mix   = O.mix   = O.assign
+export const own = use.own   = O.own   = O.hasOwn
+export const too = use.too   = O.too   = O.fromEntries
+
+export const keys    = use.keys    = O.keys
+export const values  = use.values  = O.values
+export const entries = use.entries = O.entries
+
+// since "from" appears to be reserved keyword
+use(O, use, {
   get o() {
     return O.create(µ)
   },
@@ -79,5 +114,4 @@ use(use, {
         ?? Array.from(a, b ??= (v, i) => [ i, v ]))
       : O.entries(a)
   },
-
 })
