@@ -4,7 +4,7 @@ import {
   notDeepStrictEqual as nope,
 } from 'assert'
 
-import Log from '../util/log.js'
+import '../config/config.js'
 import * as jwt from '../wheels/jwt.js'
 
 describe('Jwt', () => {
