@@ -16,9 +16,11 @@ export function get(x, fallback = x) {
 export function is(expected, actual) {
   if (typeof actual != 'string')
     actual = fromHead(actual, false)
+
+  expected = get(expected, expected)
   return actual
-    ? get(expected) === actual
-    : actual
+    ? actual.includes(expected)
+    : actual == expected
 }
 
 export function fromHead(x, fallback = '') {
@@ -61,19 +63,41 @@ function init() {
     text/plain                         txt
     text/html                          html
     text/css                           css
+    text/less                          less
+    text/x-asm                         s asm
+    text/x-sass                        sass
+    text/x-scss                        scss
+    text/csv                           csv
+    text/jsx                           jsx
+    text/x-markdown                    md
+    text/yaml                          yaml yml
+    text/xml                           xml
+
     image/gif                          gif
     image/png                          png
     image/jpeg                         jpg  jpeg
     image/svg+xml                      svg  svgz
     image/x-icon                       ico
+    image/webp                         webp
+
     font/woff                          woff woff2
-    application/xml                    xml
+    font/opentype                  otf
+    application/x-font-bdf         bdf
+    application/x-font-otf         otf
+    application/x-font-pcf         pcf
+    application/x-font-snf         snf
+    application/x-font-ttf         ttf ttc
+    application/x-font-type1       pfa pfb pfm afm
+    application/x-font-linux-psf   psf
+
     application/zip                    zip tar
     application/json                   json
     application/javascript             js
     application/octet-stream           bin dmg iso img
+
     multipart/form-data                form
     application/x-www-form-urlencoded  query
+
   `.trim().split(/\n+/g)) {
     const [ type, ...alias ] = line.match(/\S+/g)
     mm[ type ] = type
