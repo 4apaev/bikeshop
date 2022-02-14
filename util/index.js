@@ -29,7 +29,8 @@ export function sanitizePath(x) {
 }
 
 export function tmpl(s, a, cb = x => x) {
-  for (var i = 0, re = [ s.raw[ i ] ]; i < a.length;)
+  let re = [ s.raw[ 0 ] ]
+  for (let i = 0; i < a.length;)
     re = re.concat(cb(a[ i++ ]), s.raw[ i ])
   return re
 }
@@ -38,9 +39,9 @@ tmpl.raw = (s, ...a) => tmpl(s, a).join('')
 
 export function rxpath(s) {
   return new RegExp(s
-    .replace(/:(\w+)/g, `(?<$1>w+)`)
-    .replace(/(?<!\\)\//g, `\\/`)
-    .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
+      .replace(/:(\w+)/g, `(?<$1>w+)`)
+      .replace(/(?<!\\)\//g, `\\/`)
+      .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
 }
 
 O.use(Array, {
@@ -56,14 +57,24 @@ O.use(Array, {
 })
 
 O.use(Array.prototype, {
-  get head() { return this[ 0 ] },
-  get tail() { return this.at(-1) },
-  get uniqe() { return Array.from(new Set(this)) },
+  get head() {
+    return this[ 0 ]
+  },
+  get tail() {
+    return this.at(-1)
+  },
+  get uniqe() {
+    return Array.from(new Set(this))
+  },
 })
 
 O.use(String.prototype, {
-  get up() { return this.toUpperCase() },
-  get low() { return this.toLowerCase() },
+  get up() {
+    return this.toUpperCase()
+  },
+  get low() {
+    return this.toLowerCase()
+  },
 })
 
 O.alias(Array.prototype, 'head',  String.prototype)
