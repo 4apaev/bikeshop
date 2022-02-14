@@ -1,54 +1,97 @@
+import { CODES, STATUSES } from './fail.code.js'
+
+const µ = undefined
+const { assign } = Object
+const { prepareStackTrace } = Error
+
 export default class Fail extends Error {
+  code
+  cause
+  message = 'Epic Fail'
   name = 'Fail'
 
-  constructor(m, c) {
-    [ m, c ] = parse(m, c)
-    super(m, c)
+  static as = as
+  static Try = Try
+  static deny = deny
+  static trace = trace
+  static raise = raise
+  static assert = assert
+
+  static CODES = CODES
+  static STATUSES = STATUSES
+
+  constructor(e, c) {
+    super()
     Error.captureStackTrace(this, this.constructor)
-    this.message = m
+    if (Error[ Symbol.hasInstance ](e)) {
+      this.message = 'rethrow: ' + e.message
+      this.cause = e.cause ?? e
+      this.stack += '\n\n' + e.stack
+    }
+    else if (e) {
+      this.message = e in Fail.CODES
+        ? Fail.CODES[ this.code = e ]
+        : e
+      this.cause = c?.cause ?? c
+      this.code ??= e?.code ?? this?.cause?.code ?? STATUSES[ e ] ?? 0
+    }
   }
 
   set(k, v) {
-    return Object.assign(this, typeof k == 'object'
-      ? k
-      : { [ k ]: v })
+    return k
+      ? assign(this, typeof k == 'object'
+        ? k
+        : { [ k ]: v })
+      : this
   }
 
-  static as = (m, c) => new this(m, c)
-  static assert = (a, b) => a || this.raise(b, { cause: 'assert' })
-  static raise = (m, c) => { throw this.as(m, c) }
-  static deny = (m, c) => Promise.reject(this.as(m, c))
-  static trace(start = Fail.trace) {
-    const ps = Error.prepareStackTrace
-    Error.prepareStackTrace = (_, s) => s
+  static is = x => this[ Symbol.hasInstance ](x)
 
-    const e = new Error
-    Error.captureStackTrace(e, start)
+}
 
-    const { stack } = e
-    Error.prepareStackTrace = ps
+export function as(m, c) {
+  return new Fail(m, c)
+}
 
-    return stack.map(cs => ({
-      file: cs.getFileName(),
-      row: cs.getLineNumber(),
-      col: cs.getColumnNumber(),
-      fname: cs.getFunctionName(),
-      // self    : cs.getThis(),
-      // method  : cs.getMethodName(),
-      // type    : cs.getTypeName(),
-      // isCtor  : cs.isConstructor(),
-      // isAsync : cs.isAsync(),
-      // isNative: cs.isNative(),
-    }))
+export function deny(m, c) {
+  return Promise.reject(new Fail(m, c))
+}
+
+export function raise(m, c) {
+  throw new Fail(m, c)
+}
+
+export function assert(x, m) {
+  x || raise(m, 'assertation failed')
+}
+
+function Try(fn, ...a) {
+  try {
+    return [ µ, fn.apply(µ, a) ]
+  }
+  catch (e) {
+    return [ new Fail(e?.message ?? 'Try failed', e), µ ]
   }
 }
 
-export const deny = Fail.deny
-export const raise = Fail.raise
-export const assert = Fail.assert
+export function trace(start = trace) {
+  Error.prepareStackTrace = callSite // (_, cs) => cs
 
-function parse(a, b) {
-  return Error[ Symbol.hasInstance ](a)
-    ? [ 'rethrow: ' + a.message, { cause: a }]
-    : [ a, { cause: b?.cause ?? b }]
+  const e = new Error
+  Error.captureStackTrace(e, start)
+
+  const { stack } = e
+  Error.prepareStackTrace = prepareStackTrace
+  return stack // .map(callSite)
 }
+
+function callSite(_, cs) {
+  return {                         // eslint-disable-next-line key-spacing
+    file  : cs.getFileName(),      // eslint-disable-next-line key-spacing
+    row   : cs.getLineNumber(),    // eslint-disable-next-line key-spacing
+    col   : cs.getColumnNumber(),  // eslint-disable-next-line key-spacing
+    fname : cs.getFunctionName(),  // eslint-disable-next-line key-spacing
+    type  : cs.getTypeName(),
+  }
+}
+
