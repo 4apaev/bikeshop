@@ -32,7 +32,7 @@ Is.eq = use('equality', function eql(a, b) {
   if (t != T(b)) return false
   if (t == 'Object') t = 'Array', a = O.entries(a), b = O.entries(b)
   else if (t == 'Set' || t == 'Map') t = 'Array', a = A.from(a), b = A.from(b) // eslint-disable-next-line multiline-ternary
-  return t == 'Array' ? a.length !== b.length ? false : a.every((x, i) => eql(x, b[ i ])) : false
+  return t == 'Array' ? a.length !== b.length ? false : a.every((x, i) => eql(x, b[ i ])) : String(a) === String(b)
 })
 
 //////////////////////////////////////////////////////////////////////////////////////
