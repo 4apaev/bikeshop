@@ -4,10 +4,16 @@ import is from '/util/is.js'
 const µ = null
 const A = Array
 const E = new WeakMap
+const Px = new WeakMap
 const STOP = Symbol('📛')
 const doc = document
 
 is.use('node', x => Node[ Symbol.hasInstance ](x))
+
+export function camel2snake(s) {
+  return s.replace(/([a-z])([A-Z])/g, '$1-$2')
+      .replace(/([A-Z])([a-z])/g, '$1-$2')
+}
 
 export default function JQ(q, el = doc, cb) {
   if (is.f(el))
@@ -32,9 +38,38 @@ O.use(JQ, {
     return E.get(x)
   },
 
-  text() { return doc.createTextNode.apply(doc, arguments) },
-  attr() { return doc.createAttribute.apply(doc, arguments) },
-  comment() { return doc.createComment.apply(doc, arguments) },
+  text() {
+    return doc.createTextNode.apply(doc, arguments) 
+  },
+  attr() {
+    return doc.createAttribute.apply(doc, arguments) 
+  },
+  comment() {
+    return doc.createComment.apply(doc, arguments) 
+  },
+
+  proxy(el) {
+    return Px.set(el, Proxy.revocable(el, {
+      has(el, k) {
+        return el.hasAttribute(camel2snake(k))
+      },
+
+      get(el, k) {
+        const x = el.getAttribute(camel2snake(k))
+        return x === ''
+          ? true
+          : x
+      },
+
+      set(el, k, v) {
+        const key = camel2snake(k)
+        if (typeof v == 'boolean' || v == null)
+          return el.toggleAttribute(key, !!v)
+        el.setAttribute(key, v)
+        return true
+      },
+    })).get(el)
+  },
 
   create(name, props, ...children) {
     const el = doc.createElement(name)
@@ -62,7 +97,6 @@ O.alias(Node.prototype, 'parentElement', 'parent')
 
 O.alias(Element.prototype, 'classList', 'cls')
 O.alias(Element.prototype, 'hasAttribute', 'has')
-O.alias(Element.prototype, 'getAttribute', 'get')
 O.alias(Element.prototype, 'toggleAttribute', 'toggle')
 O.alias(Element.prototype, 'querySelector', 'find')
 O.alias(Element.prototype, 'lastElementChild', 'last')
@@ -72,9 +106,7 @@ O.alias(Element.prototype, 'previousElementSibling', 'prev')
 
 O.use(Element.prototype, {
   $(s, cb) {
-    return cb
-      ? A.from(this.querySelectorAll(s), cb)
-      : this.querySelector(s)
+    return JQ(s, this, cb)
   },
 
   html(s, ...a) {
@@ -105,10 +137,21 @@ O.use(Element.prototype, {
     return this
   },
 
+  get(k) {
+    const v = this.getAttribute(k)
+    return v === ''
+      ? true
+      : v
+  },
+
   set(k, v) {
     if (is.b(v ??= false))
       return this.toggleAttribute(k, v)
-    this.setAttribute(k, v)
+
+    if (is.o(v))
+      O.each((v, k) => this.dataset[ k ] = v)
+    else
+      this.setAttribute(k, v)
     return this
   },
 

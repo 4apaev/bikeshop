@@ -1,16 +1,15 @@
 /* eslint-disable no-unused-vars */
+import $ from '../dom.js'
 
 export default class Base extends HTMLElement {
-  css
+  uid   = crypto.randomUUID().replace(/^[\d-]+/, '')
   slug  = 'base'
   title = 'base'
+  css   = 'display: block'
   tmpl  = `<h3>base</h3>`
 
   constructor() {
     super()
-    this.uid = crypto.randomUUID().replace(/^[\d-]+/, '')
-    // this.attachShadow({ mode: 'open' })
-    // this.shadowRoot.innerHTML = this.tmpl
   }
 
   disconnectedCallback() {
@@ -18,13 +17,16 @@ export default class Base extends HTMLElement {
   }
 
   connectedCallback() {
-    this.html(this.tmpl.trim())
-    this.constructor.style(this, this.css)
-    this.classList.add(this.uid)
-  }
+    const tmpl = this?.tmpl?.trim?.()
+    const styl = this?.css?.trim?.()
 
-  static style(el, css) {
-    css && el.insert(`<style> ${ css } </style>`, 'afterbegin')
+    tmpl?.length && this.html(tmpl)
+    styl?.length && this.insertBefore(
+      $.style(this.css),
+      this.$(':not(style)')
+          || this.first,
+    )
+    this.classList.add(this.uid)
   }
 
   static define(tag) {
@@ -34,3 +36,6 @@ export default class Base extends HTMLElement {
 }
 
 Base.define()
+
+// this.attachShadow({ mode: 'open' })
+// this.shadowRoot.innerHTML = this.tmpl
