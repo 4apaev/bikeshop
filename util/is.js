@@ -104,7 +104,7 @@ T.args = (args, cb = T, prev = {}) => {
   return prev
 }
 
-/** @type {<T, K extends keyof T>(obj: T, params: K[]) => Array<T[K]>} */
+/* @type {<T, K extends keyof T>(obj: T, params: K[]) => Array<T[K]>} */
 
 /**
  * @callback check

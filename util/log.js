@@ -4,58 +4,45 @@ import {
 } from 'util'
 
 const { BIKESHOP_DEBUG: DEBUG = '*' } = process.env
-const debuggers = new Set
+const µ = null
 
 export default function Log(s, ...a) {
-  if (isRaw(s)) {                                        // eslint-disable-next-line no-var
-    for (var i = 0, args = [ s.raw[ i ] ]; i < a.length;)
+  let args
+  if (Array.isArray(s?.raw)) {
+    args = [ s.raw[ 0 ] ]
+    for (let i = 0; i < a.length;)
       args = args.concat(inspect(a[ i++ ]), s.raw[ i ])
-    console.log.apply(console, args)
   }
-  else {
-    console.log.apply(console, arguments)
-  }
+  console.log.apply(console, args ?? arguments)
 }
 
 use(Log, console)
-use(Log, {
-  format,
-  inspect,
 
-  get reset() {
-    process.stdout.write(`\x1b[0m`)
-    return Log
-  },
+Log.debug = debug
+Log.table = console.table
+Log.trace = console.trace
+Log.error = console.error
+Log.write = write.bind(µ, process.stdout)
+Log.write.error = write.bind(µ, process.stderr)
 
-  write(s, ...a) {
-    if (isRaw(s)) {
-      for (let i = 0; i < a.length; i++)
-        process.stdout.write(s.raw[ i ], inspect(a[ i ]))
-      process.stdout.write(s.raw.at(-1))
-    }
-    else {
-      process.stdout.write(format(s, ...a))
-    }
-    process.stdout.write('\n')
-  },
-
-  debug(prefix) {
-    debuggers.add(prefix)
-    const head = randBgColor(prefix)
-    return DEBUG == '*' || DEBUG.includes(prefix)
-      ? (s, ...a) => Log(head, format(s, ...a))
-      : () => {}
-  },
-})
-
-export function getDebuggers(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-  ctx.body = [ ...debuggers ]
+function write(soc, s, ...a) {
+  soc.write(s.raw[ 0 ])
+  for (let i = 0; i < a.length;)
+    soc.write(inspect(a[ i++ ]), s.raw[ i ])
+  soc.write('\n')
 }
 
-function isRaw(x) {
-  return Array.isArray(x?.raw)
+export function debug(prefix) {
+  const head = randBgColor(prefix)
+  const ok = DEBUG == '*' || DEBUG.includes(prefix)
+
+  const fn = ok
+    ? (s, ...a) => Log(head, format(s, ...a))
+    : () => {}
+  fn.error = ok
+    ? (s, ...a) => Log.error(head, format(s, ...a))
+    : fn
+  return fn
 }
 
 function use(a, b) {
@@ -89,3 +76,24 @@ randBgColor.i = 0 | Math.random() * randBgColor.pairs.length; [
   Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3${ i }sm%s\x1b[39m`)
 })
 
+/*
+
+//var sketch = require('sketch')
+
+console.log('This is an example Sketch script.')
+
+var document = sketch.getSelectedDocument()
+
+var selectedLayers = document.selectedLayers
+var selectedCount = selectedLayers.length
+
+if (selectedCount === 0) {
+  console.log('No layers are selected.')
+} else {
+  console.log('Selected layers:');
+  selectedLayers.forEach(function (layer, i) {
+    console.log((i + 1) + '. ' + layer.name)
+  })
+}
+
+*/
