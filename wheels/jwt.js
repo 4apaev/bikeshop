@@ -81,8 +81,8 @@ export function verify(s) {
  */
 export function sign(...a) {
   return Crypt.createHmac('SHA256', secret)
-    .update(a.join(LNK))
-    .digest('base64')
+      .update(a.join(LNK))
+      .digest('base64')
 }
 
 /** @type {import("koa").Middleware} */

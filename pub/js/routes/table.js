@@ -38,8 +38,13 @@ export default class Table extends Base {
   #form
   #dialog
 
-  get form() { return this.#form ??= this.$('ws-form') }
-  get dialog() { return this.#dialog ??= this.$('dialog') }
+  get form() {
+    return this.#form ??= this.$('ws-form') 
+  }
+
+  get dialog() {
+    return this.#dialog ??= this.$('dialog') 
+  }
 
   connectedCallback() {
     super.connectedCallback()
@@ -47,8 +52,8 @@ export default class Table extends Base {
     this.on('click', 'button.close', (e, stop) => (this.dialog.close(), stop))
 
     Sync.get(this.apiUrl, { limit: 10 })
-      .then(this.render)
-      .catch(Log.error)
+        .then(this.render)
+        .catch(Log.error)
 
   }
 
