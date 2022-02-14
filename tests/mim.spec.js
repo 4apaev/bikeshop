@@ -12,7 +12,7 @@ describe('Mim', () => {
     equal(Mim.gif, 'image/gif')
     equal(Mim.png, 'image/png')
     equal(Mim.jpg, 'image/jpeg')
-    equal(Mim.xml, 'application/xml')
+    equal(Mim.xml, 'text/xml')
     equal(Mim.json, 'application/json')
     equal(Mim.js, 'application/javascript')
     equal(Mim.bin, 'application/octet-stream')
