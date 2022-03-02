@@ -9,7 +9,7 @@ ignorePatterns:
   - '**/*.css'
   - '**/*.html'
   - '**/node_modules/**'
-  - './tests/**'
+  - '**/tests/**'
 
 parser: '@babel/eslint-parser'
 
@@ -26,9 +26,12 @@ parserOptions:
 
 rules:
   no-unneeded-ternary: error
-  no-cond-assign: error
   no-debugger: error
   no-var: warn
+  no-cond-assign: off
+  no-empty:
+    - error
+    - allowEmptyCatch: true
 
   no-unused-vars:
     - error
@@ -72,9 +75,9 @@ rules:
 
   brace-style:
     - error
-    # - 1tbs
     - stroustrup
-    - allowSingleLine: true
+    # - 1tbs
+    # - allowSingleLine: true
 
   quotes:
     - error
@@ -235,11 +238,15 @@ rules:
     - SwitchCase: 1
       outerIIFEBody: 1
       ArrayExpression: 1
-      MemberExpression: 1
       ObjectExpression: 1
       ImportDeclaration: 1
-      VariableDeclarator: first
+      MemberExpression: 2
+      VariableDeclarator:
+        const: 2
+        var: 2
+        let: 1
 
+      ignoreComments: true
       flatTernaryExpressions: true
       offsetTernaryExpressions: false
 
@@ -247,11 +254,11 @@ rules:
         arguments: 1
 
       FunctionDeclaration:
-        parameters: 1
+        parameters: 2
         body: 1
 
       FunctionExpression:
-        parameters: 1
+        parameters: 2
         body: 1
 
   ##################################################################################################

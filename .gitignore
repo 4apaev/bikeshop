@@ -1,11 +1,9 @@
 .DS_Store
 .env
-.idea
 .c8temp
 .c8cover
-*.txt
-coverage
+
+_
+types
 node_modules
-test.*
-tmp.*
 
