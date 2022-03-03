@@ -1,24 +1,8 @@
-/* eslint-disable no-unused-vars */
 // @ts-check
 
 import pg from 'pg'
-
 import Log from '../util/log.js'
-
 import { pgconf } from '../config/config.js'
-
-/**
- * @callback QWhere
- * @param {Object<string, *>} props
- * @param {number} [limit=10]
- */
-
-/**
- * @typedef {Object} QRes
- * @prop {pg.DatabaseError?} error
- * @prop {pg.QueryResult} result
- * @prop {?} value
- */
 
 const debug = Log.debug('db')
 export const pool = new pg.Pool(pgconf)
@@ -28,12 +12,11 @@ pool.on('remove', () => debug('[pool] client removed'))
 pool.on('error', e => debug(`[pool:error]`, e))
 
 /**
- * @param {string | pg.QueryArrayConfig<*>} sql
- * @param {*[]} params
- * @param {1|true} [single]
+ * @param  {string | pg.QueryArrayConfig<*>} sql
+ * @param  {*[]} params
  * @return {Promise<QRes>}
  */
-export default async function query(sql, params, single) {
+export default async function query(sql, params) {
   let error, result
 
   try {
@@ -47,15 +30,13 @@ export default async function query(sql, params, single) {
   return {
     error,
     result,
-    value: single
-      ? result?.rows?.[ 0 ]
-      : result?.rows,
+    value: result?.rows ?? [],
   }
 }
 
 /**
- * @param {string} table
- * @param {...string} keys
+ * @param  {string} table
+ * @param  {string[]} keys
  * @return {QWhere}
  */
 export function where(table, ...keys) {
@@ -80,3 +61,13 @@ export function where(table, ...keys) {
   }
 }
 
+/**
+ * @callback QWhere
+ * @param {Object<string, *>} props
+ * @param {number} [limit=10]            *//**
+
+ * @typedef {Object} QRes
+ * @prop {pg.DatabaseError?} error
+ * @prop {pg.QueryResult} result
+ * @prop {?} value
+ */
