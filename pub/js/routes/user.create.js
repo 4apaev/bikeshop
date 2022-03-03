@@ -1,17 +1,13 @@
 import $ from '/js/dom.js'
-import Sync from '/js/sync.js'
+import Sync from '../sync.js'
+import Base from '../comp/form.js'
 
-export default class Auth extends HTMLElement {
-  uid = crypto.randomUUID().replace(/^[\d-]+/, '')
+export default class Auth extends Base {
+  css = `@import url('/css/auth.styl?margin=0&uid=${ this.uid }')`
   tmpl = `
-    <style>
-      @import url('/css/auth.styl?margin=0&uid=${ this.uid }')
-    </style>
-
-    <form class="${ this.uid }">
+    <form>
       <legend>sign up</legend>
-
-      <blockquote></blockquote>
+      <blockquote/>
 
       <fieldset>
         <label for=uname>name</label>
@@ -46,33 +42,25 @@ export default class Auth extends HTMLElement {
           placeholder="!123"
         />
       </fieldset>
-
       <button class="btn send">sign up</button>
     </form>
   `
+  #form
 
-  disconnectedCallback() {
-    this.off('submit')
-    this.off('change')
+  get form() {
+    return this.#form ??= this.$('form')
   }
 
   connectedCallback() {
-    this.html(this.tmpl)
+    super.connectedCallback()
+
     this.on('submit', this.submit)
     this.on('change', () => this.show())
   }
 
-  send() {
-    const form = this.$('form')
-    return Sync.post('/api/users', {
-      uname: form.uname.value,
-      email: form.email.value,
-      pass: form.pass.value,
-    })
-  }
-
   reset() {
-    this.$('form').reset()
+    this.form.reset()
+    this.form.$('btn.send').set('disabled', false)
   }
 
   show(msg, err) {
@@ -87,19 +75,24 @@ export default class Auth extends HTMLElement {
   submit = async e => {
     $.stop(e)
 
-    this.$('.send').set('disabled', true)
+    const btn = this.form.$('btn.send')
+    btn.toggle('disabled', true)
 
     try {
-      const re = await this.send()
+      const re = await Sync.post('/api/users', {
+        uname: this.form.uname.value,
+        email: this.form.email.value,
+        pass: this.form.pass.value,
+      })
       this.emit('fetch', re.body)
       history.replaceState({}, 'some', location.pathname)
     }
     catch (err) {
       this.show(err?.message ?? err?.body?.message ?? 'Error', 1)
     }
+
     finally {
       this.reset()
-      this.$('.send').set('disabled', false)
     }
   }
 

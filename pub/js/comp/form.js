@@ -4,17 +4,20 @@ import Base from './base.js'
 import O from '../../../util/define.js'
 
 export default class Form extends Base {
+  #req
+  #form
+  #container
 
-  tmpl = `
+  get tmpl() {
+    return `
     <form class="create-entry">
       <header>
-        <h3 class="title">${ this.title }</h3>
+        <h3 class="title">${ this.get('title') }</h3>
       </header>
 
       <blockquote></blockquote>
 
       <main class="container">
-        <slot></slot>
       </main>
 
       <footer>
@@ -22,15 +25,14 @@ export default class Form extends Base {
       </footer>
     </form>
   `
-
-  #form
+  }
 
   get form() {
     return this.#form ??= this.$('form')
   }
 
-  get payload() {
-    return Object.fromEntries(new FormData(this.form))
+  get container() {
+    return this.#container ??= this.form.$('main.container')
   }
 
   connectedCallback() {
@@ -40,32 +42,25 @@ export default class Form extends Base {
   }
 
   appendField({ key, label, options, ...opt }) {
-    const id = `${ this.uid }-${ key }`
-    opt.id = id
+    const id = (opt.id ??= `${ this.uid }-${ key }`)
     opt.name ??= key
+
     const input = options
-      ? $.select(opt, ...options.map(o => $.option({ value: o }, o)))
+      ? $.select(opt, ...options.map(x =>
+        O(x) === x
+          ? $.option(x, x.value)
+          : $.option({ value: x }, x)))
       : $.input(opt)
-    this.$('.container').appendChild($.fieldset($.label({ for: id }, label), input))
+
+    this.container.appendChild(
+      $.fieldset(
+        $.label({ for: id },
+          label ?? key),
+        input))
   }
 
-  appendInputField({ key, label, options, ...opt }) {
-
-    const attrs = O.each((v, k, prev) => {
-      prev + `${ k }="${ v }"`
-    }, '')
-
-    this.$('.container').html`
-      <fieldset>
-        <label for="${ this.uid }-${ key }">${ label }</label>
-      </fieldset>
-    `
-  }
-
-  send() {
-    const url = this.get('apiurl')
-    const method = this.get('method') ?? 'post'
-    return Sync[ method ](url, this.payload)
+  send(x) {
+    return Sync[ this.get('method') ?? 'post' ](this.get('apiurl')).send(x)
   }
 
   reset() {
@@ -88,7 +83,7 @@ export default class Form extends Base {
     this.$('.send').set('disabled', true)
 
     try {
-      await this.send()
+      await this.send(this.form)
     }
     catch (err) {
       this.show(err?.message ?? err?.body?.message ?? 'Error', 1)
@@ -97,7 +92,6 @@ export default class Form extends Base {
       this.reset()
     }
   }
-
 }
 
 Form.define()
