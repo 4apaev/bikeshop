@@ -2,10 +2,10 @@
 @require 'reset'
 
 body
-  line-height: 1
-  font: $.font.size.a/$.font.size.b $.font.family
+  font            : $.font.size.a/$.font.size.b $.font.family
+  color           : $.fg.b
   background-color: $.bg.b
-  color: $.fg.b
+  line-height     : 1
 
 ws-router
   display: block
@@ -13,14 +13,22 @@ ws-router
 
 @require 'buttons'
 
+hr
+  display   : block
+  margin    : 1em 0
+  border    : none
+  height    : 1px
+  background: transparent
+  box-shadow: 0 -1px 0 $.shd.c, 0 1px 0 $.shd.a
+
 
 dialog
-  width: 32rem
-  margin: 4rem auto
-  border: 1px solid $.br.a
-  background: $.bg.b
-  border-radius: $.radius.a
-  box-shadow: 0 2px 1em $.shd.c
+  width         : 32rem
+  margin        : 20vh auto
+  border        : 1px solid $.br.a
+  background    : $.bg.b
+  border-radius : $.radius.a
+  box-shadow    : 0 2px 1em $.shd.c
   .close
     top: 0
     right: 0
