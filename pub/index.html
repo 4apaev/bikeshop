@@ -10,15 +10,17 @@
   <link rel=icon href="/img/favicon.svg"/>
   <link rel=stylesheet type="text/css" href="/css/main.styl">
 
+  <script>
+    const Log = Object.defineProperties(console.log, Object.getOwnPropertyDescriptors(console))
+    window.Log = window.log = globalThis.Log = globalThis.log = Log
+  </script>
+
   <script type="module">
-    import O from '/util/define.js'
-    import $ from '/js/dom.js'
+    import O    from '/util/define.js'
+    import Is   from '/util/is.js'
+    import $    from '/js/dom.js'
     import Sync from '/js/sync.js'
-
-    const Log = O.use(console.log.bind(console), console)
-    Log.c = (c, ...a) => Log('%c%s', `color: ${ c }`, ...a)
-
-    O.mix(globalThis, { O, $, Sync, Log, log: Log })
+    Object.assign(window, { O, $, Is, Sync, Log, log: Log })
   </script>
 </head>
 
@@ -36,14 +38,14 @@
         <a route="/app/scheduler">Scheduler</a>
       </aside>
 
-      <ws-route path="/"              comp="ws-home"      src="/js/routes/home.js" ></ws-route>
-      <ws-route path="/app/bikes"     comp="ws-bikes"     src="/js/routes/bikes.js" ></ws-route>
-      <ws-route path="/app/users"     comp="ws-users"     src="/js/routes/users.js" ></ws-route>
-      <ws-route path="/app/scheduler" comp="ws-scheduler" src="/js/routes/scheduler.js" ></ws-route>
-      <ws-route path="/app/login"     comp="ws-login"     src="/js/routes/auth.login.js" ></ws-route>
-      <ws-route path="/app/remind"    comp="ws-remind"    src="/js/routes/auth.remind.js"></ws-route>
-      <ws-route path="/app/*"         comp="ws-notfound"></ws-route>
-      <ws-output class="grid page tabs"></ws-outlet>
+      <ws-route title="Home"                                 path="/"              comp="ws-home"      src="/js/routes/home.js" ></ws-route>
+      <ws-route title="Bikes"     apiurl="/api/bikes"        path="/app/bikes"     comp="ws-bikes"     src="/js/routes/bikes.js" ></ws-route>
+      <ws-route title="Users"     apiurl="/api/users"        path="/app/users"     comp="ws-users"     src="/js/routes/users.js" ></ws-route>
+      <ws-route title="Scheduler" apiurl="/api/user-bikes"   path="/app/scheduler" comp="ws-scheduler" src="/js/routes/scheduler.js" ></ws-route>
+      <ws-route title="Login"     apiurl="/api/auth/login"   path="/app/login"     comp="ws-login"     src="/js/routes/auth.login.js" ></ws-route>
+      <ws-route title="Remind"    apiurl="/api/auth/remind"  path="/app/remind"    comp="ws-remind"    src="/js/routes/auth.remind.js"></ws-route>
+      <ws-route title="Not Found"                            path="/app/*"         comp="ws-notfound"></ws-route>
+      <ws-output class="grid page"></ws-outlet>
     </ws-router>
 
     <script type="module" src="/js/router.js"></script>
