@@ -1,41 +1,46 @@
 // @ts-check
 import Fs from 'fs'
+import Path from 'path'
+import Styl from 'stylus'
+
 import {
   stat as Stats,
 } from 'fs/promises'
-import Path from 'path'
-import Styl from 'stylus'
-import Koa from 'koa'
+
 import {
   Log,
   sanitizePath,
 } from '../util/index.js'
+
 import * as Mim from '../util/mim.js'
+
 const debug = Log.debug('static')
 
 /**
- * @param {string} [base]
- * @param {{ [x: string]: string; }} [dict]
+ * @param  {string} [base]
+ * @param  {{[x: string]: string;}} [dict]
+ * @return {Mware}
  */
 export function statiq(base, dict) {
   base ??= process.cwd()
   dict ??= { '/': '/index.html' }
-  return /** @type {Koa.Middleware} */ ctx => {
+  return ctx => {
     let path = sanitizePath(ctx.path)
     return sendFile(ctx, Path.join(base, dict[ path ] ?? path))
   }
 }
 
 /**
- * @param {string} file
+ * @param  {string} file
+ * @return {Mware}
  */
 export function send(file) {
-  return /** @type {Koa.Middleware} */ ctx =>
+  return ctx =>
     sendFile(ctx, file)
 }
 
 /**
- * @param {Koa.Context} ctx
+ * @param {Context} ctx
  * @param {string} file
  */
 export async function sendFile(ctx, file) {
@@ -66,8 +71,8 @@ export async function sendFile(ctx, file) {
 }
 
 /**
- * @param {Koa.Context} ctx
- * @param {Fs.Stats} stat
+ * @param  {Context} ctx
+ * @param  {Fs.Stats} stat
  * @return {boolean}
  */
 function ETag(ctx, stat) {
@@ -82,9 +87,9 @@ function ETag(ctx, stat) {
 }
 
 /**
- * @param { string } filename
+ * @param {string} filename
  * @param {{ (e?: Error, css?: string): void }} fn
- * @param { URLSearchParams } opts
+ * @param {URLSearchParams} opts
  */
 export default function compile(filename, fn, opts) {
 
@@ -97,9 +102,9 @@ export default function compile(filename, fn, opts) {
 }
 
 /**
- * @param { string } filename
- * @param { URLSearchParams } opts
- * @returns { Promise<string> }
+ * @param   {string} filename
+ * @param   {URLSearchParams} opts
+ * @returns {Promise<string>}
  */
 export function compileAsync(filename, opts) {
   return new Promise((ok, nope) => compile(filename, (e, css) => {
@@ -109,3 +114,8 @@ export function compileAsync(filename, opts) {
       ok(css)
   }, opts))
 }
+
+/**
+ * @typedef {import('koa').Context} Context  */ /**
+ * @typedef {import('koa').Middleware} Mware */ /**
+ */

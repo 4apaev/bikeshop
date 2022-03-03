@@ -1,9 +1,14 @@
 // @ts-check
-import Koa from 'koa'
 import * as Mim from '../util/mim.js'
-import { Log } from '../util/index.js'
+import { O, Is, Log } from '../util/index.js'
+import * as format from '../util/date.js'
+import crypto from 'crypto'
 
 const debug = Log.debug('middleware')
+
+/**
+ * @typedef {import("koa").Middleware} Mware
+ */
 
 export const methods = new Set([
   'POST',
@@ -12,14 +17,32 @@ export const methods = new Set([
   'DELETE',
 ])
 
-/** @type {Koa.Middleware} */
+/** @type {Mware} */
 export async function logger(ctx, next) {
-  const start = Date.now()
+  const start = Date.now() // @ts-ignore
+  ctx.params = O.o
+  ctx.id = crypto.randomUUID()
+
   await next()
-  Log('%d %s %s %s', ctx.status, ctx.method, ctx.path, Date.now() - start)
+  debug('%s %d %s %s %s',
+    format.date(start),
+    ctx.status,
+    ctx.method,
+    ctx.path,
+    Date.now() - start)
 }
 
-/** @type {Koa.Middleware} */
+/** @type {Mware} */
+export function echo(ctx) {
+  let { payload = {}} = ctx
+  if (Is.not.o(payload))
+    payload = { payload }
+  payload.uptime = format.period(process.uptime() * 1000)
+  ctx.status = 200
+  ctx.body = payload
+}
+
+/** @type {Mware} */
 export async function reqPayload(ctx, next) {
   if (!methods.has(ctx.method))
     return next()
@@ -33,7 +56,7 @@ export async function reqPayload(ctx, next) {
   return parsePayload(ctx, next)
 }
 
-/** @type {Koa.Middleware} */
+/** @type {Mware} */
 function parsePayload(ctx, next) {
   if (!ctx.is(Mim.json))
     return next()
@@ -57,3 +80,4 @@ function parsePayload(ctx, next) {
     }
   }
 }
+
