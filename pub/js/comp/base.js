@@ -6,10 +6,8 @@ export default class Base extends HTMLElement {
   slug  = 'base'
   title = 'base'
   css   = 'display: block'
-  tmpl  = `<h3>base</h3>`
-
-  constructor() {
-    super()
+  get tmpl() {
+    return `<h3>base</h3>`
   }
 
   disconnectedCallback() {
