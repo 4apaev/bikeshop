@@ -4,6 +4,8 @@ export function push(path, data) {
   history.pushState(data, data?.title, path)
 }
 
+const Seen = new Set
+
 export default class Router extends HTMLElement {
   #view
   output = this.$('ws-output')
@@ -27,22 +29,23 @@ export default class Router extends HTMLElement {
     const route = this.$(`ws-route[path="${ url.pathname }"]`)
       ?? this.$('ws-route[path="/app/*"]')
 
-    const src = route.get('src')
-    const props = url.searchParams
-      ? Object.fromEntries(url.searchParams)
-      : {}
+    const attr = route.attr()
+    if (url?.searchParams) {
+      Object.assign(attr,
+        Object.fromEntries(url.searchParams))
+    }
 
-    if (src)
-      await import(src)
+    if (attr.src && !Seen.has(attr.src))
+      await import(attr.src)
 
-    const view = $.create(route.get('comp'))
+    const view = $.create(route.get('comp'), attr)
     const out = route.parent === this.#view
       ? this.#view.output
       : this.output.empty()
 
     this.#view = view
+    // view.attr({ ...props, ...route.attr() })
     out.appendChild(view)
-    view.attr({ ...props, ...route.attr() })
   }
 
   listen = e => {
