@@ -21,8 +21,13 @@ export default class Sync {
   /** @type {*}       */ body
   /** @type {Headers} */ headers = new Headers(Sync.HEADERS)
 
-  get head() { return this.headers }
-  get header() { return this.headers }
+  get head() {
+    return this.headers
+  }
+
+  get header() {
+    return this.headers
+  }
 
   /**
    * @param {string} [method='GET']
