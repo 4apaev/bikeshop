@@ -1,6 +1,8 @@
 // @ts-check
-import Koa from 'koa'
+import * as Bike from '../db/bikes.js'
+import { Is, Log } from '../util/index.js'
 
+const debug = Log.debug('service:bikes')
 const Kind = new Set([
   'city',
   'road',
@@ -11,38 +13,70 @@ const Kind = new Set([
   'fixie',
 ])
 
-import * as Bike from '../db/bikes.js'
-import { Log } from '../util/index.js'
-import respond from './respond.js'
+/** @type {Mware} */
+export async function get(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
 
-const debug = Log.debug('[service:bikes]')
+  const id = +ctx?.params?.id
 
-export /** @type {Koa.Middleware} */ const get = respond(Bike.get, {
-  debug,
-  msg: 'bike not found',
-  before(ctx) {
-    return { id: +ctx.path.split('/').pop() }
-  },
-})
+  if (Is.not.n(id))
+    return ctx.deny(400, 'invalid id')
 
-export /** @type {Koa.Middleware} */ const list = respond(Bike.list, {
-  debug,
-  msg: 'bike not found',
-  before(ctx) {
-    const o = ctx.URL.searchParams
-    return o
-      ? Object.fromEntries(o)
-      : { limit: 10 }
-  },
-})
+  const { error, value } = await Bike.get({ id })
 
-export /** @type {Koa.Middleware} */ const create = respond(Bike.create, {
-  debug,
-  msg: 'fail to create bike',
+  if (error) {
+    debug('GET', error)
+    ctx.throw(400, error)
+  }
+  else {
+    ctx.body = value[ 0 ]
+  }
+}
 
-  /** @param {{ kind: string; }} o */
-  validate(o) {
-    if (!Kind.has(o?.kind))
-      return `invalid prop: bike: "kind"`
-  },
-})
+/** @type {Mware} */
+export async function list(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
+
+  const query = Object.fromEntries(ctx.URL.searchParams || [])
+  const { error, value } = await Bike.list(query)
+
+  if (error) {
+    debug('LIST', error)
+    ctx.throw(400, error)
+  }
+  else {
+    ctx.body = value
+  }
+}
+
+/** @type {Mware} */
+export async function create(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
+
+  let {
+    kind,
+    details,
+  } = ctx?.payload ?? {}
+
+  Kind.has(kind) || (kind = 'city')
+
+  const { error, value } = await Bike.create({
+    kind,
+    details,
+  })
+
+  if (error) {
+    debug('CREATE', error)
+    ctx.throw(400, error)
+  }
+  else {
+    ctx.body = { value }
+  }
+}
+
+/**
+ * @typedef {import('koa').Middleware} Mware
+ */

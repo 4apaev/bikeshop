@@ -1,49 +1,91 @@
 // @ts-check
-import * as UB from '../db/user.bikes.js'
-import { Log } from '../util/index.js'
-import respond from './respond.js'
 
-/** @typedef {import("koa").Middleware} Middleware */
+import * as UserBike from '../db/user.bikes.js'
+import { Is, Log } from '../util/index.js'
 
-const debug = Log.debug('[service:user.bikes]')
+const debug = Log.debug('service:user-bikes')
 
-export /** @type {Middleware} */ const get = respond(UB.get, {
-  debug,
-  validate,
-  before(ctx) {
-    const { uid, bid } = ctx.params
-    debug({ uid, bid })
-    return { uid, bid }
-  },
-})
+/** @type {Mware} */
+export async function get(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
 
-export /** @type {Middleware} */ const list = respond(UB.list, {
-  debug,
-  before(ctx) {
-    const o = ctx.URL.searchParams
-    return o
-      ? Object.fromEntries(o)
-      : { limit: 10 }
-  },
-})
+  let { uid, bid } = ctx?.params ?? {}
 
-export /** @type {Middleware} */ const create = respond(UB.create, {
-  debug,
-  msg: 'fail to create user bike',
-  validate,
-  before(ctx) {
-    const { uid, bid, checkin, checkout } = ctx.payload
-    return { uid, bid, checkin, checkout }
-  },
+  try {
+    Is.assert.n(uid = +uid, 'invalid user id')
+    Is.assert.n(bid = +bid, 'invalid bike id')
+  }
+  catch (e) {
+    return ctx.throw(400, e)
+  }
 
-})
+  const { error, value } = await UserBike.get({ uid, bid })
+
+  if (error) {
+    ctx.throw(400, error)
+    debug('GET', error)
+  }
+  else {
+    ctx.body = value[ 0 ]
+  }
+}
+
+/** @type {Mware} */
+export async function list(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
+  const q = Object.fromEntries(ctx.URL?.searchParams ?? [])
+  const { error, value } = await UserBike.list(q)
+
+  if (error) {
+    debug('LIST', error)
+    ctx.throw(400, error)
+  }
+  else {
+    ctx.body = value
+  }
+}
+
+/** @type {Mware} */
+export async function create(ctx) {
+  ctx.status = 200
+  ctx.type = 'json'
+
+  let {
+    uid,
+    bid,
+    checkin,
+    checkout,
+  } = ctx?.payload ?? {}
+
+  try {
+    Is.assert.n(uid = +uid, 'invalid user id')
+    Is.assert.n(bid = +bid, 'invalid bike id')
+    Is.assert.n(Date.parse(checkin), 'invalid checkin date')
+    Is.assert.n(Date.parse(checkin), 'invalid checkin date')
+  }
+  catch (e) {
+    return ctx.throw(400, e)
+  }
+
+  const { error, value } = await UserBike.create({
+    uid,
+    bid,
+    checkin,
+    checkout,
+  })
+
+  if (error) {
+    debug('CREATE', error)
+    ctx.throw(400, error)
+  }
+  else {
+    ctx.body = { value }
+  }
+
+}
 
 /**
- * @param {{uid: string; bid: string}} o
+ * @typedef {import('koa').Middleware} Mware
  */
-function validate(o) {
-  if (o.uid == null)
-    return 'invalid user id'
-  if (o.bid == null)
-    return 'invalid bike id'
-}
