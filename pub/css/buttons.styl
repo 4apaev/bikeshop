@@ -71,6 +71,7 @@ form
     padding     : 1em
     font-style  : italic
     border-left : 4px solid $.ok.a
+    font-size   : $.font.size.b
     &:empty
       display: none
     &.err
@@ -102,15 +103,33 @@ form
         flex: 3
 
   select
-    border-radius: 3px
-    line-height  : 2
-    height       : 2em
-    padding      : 0 .5em
-    background   : transparent
-    box-shadow   : 0 0 0 1px rgba(205,215,230,0.1)
-    appearance   : none
-    color        : #adbac7
-    position     : relative
+    cursor            : pointer
+    color             : $.fg.b
+    border            : 1px solid $.br.b
+    border-radius     : $.radius.a
+    display           : inline-block
+    padding           : 0 4em 0 1em
+    line-height       : 2em
+    appearance        : none
+    background-repeat : no-repeat
+    background-color  : $.bg.b
+    background-image  :
+      linear-gradient(45deg, transparent 50%, $.br.b 50%),
+      linear-gradient(135deg, $.br.b 50%, transparent 50%),
+      linear-gradient(to right, $.br.b, $.br.a)
+
+    background-position:
+      calc(100% - 1rem) 50%,
+      calc(100% - 0.7rem) 50%,
+      calc(100% - 2rem) 0
+
+    background-size: 5px 5px, 5px 5px, 1px 2rem
+    &:hover, &:focus
+      border: 1px solid $.br.d
+      background-image:
+        linear-gradient(45deg, transparent 50%, $.br.d 50%),
+        linear-gradient(135deg, $.br.d 50%, transparent 50%),
+        linear-gradient(to right, $.br.d, $.br.d)
 
   footer
     display         : flex
