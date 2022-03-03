@@ -1,10 +1,13 @@
+import Koa from 'koa'
 import { Log } from './util/index.js'
+
 import Router from './wheels/router.js'
 import * as User from './service/user.js'
 import * as Bike from './service/bike.js'
 import * as UBike from './service/user.bikes.js'
 
 import {
+  echo,
   logger,
   reqPayload,
 } from './wheels/middleware.js'
@@ -16,29 +19,61 @@ import {
 
 import { port } from './config/config.js'
 
+// import { Stream } from 'stream'
+// Is.S = Is.use('stream', x => Is(Stream, x))
+// Is.B = Is.use('buffer', x => Buffer.isBuffer(x))
+
 const debug = Log.debug('app')
 const app = new Router
 
+/**
+ * @param {number} c
+ * @param {string | Error} e
+ */
+function deny(c, e) {
+  this.status = c
+  this.type = 'json'
+  this.body = {
+    error: true,
+    message: String(e),
+  }
+}
+app.context.deny = deny
+// O.use(app.context, { deny })
+
+app.on('error', (e, ctx) => {
+  Log.error('{{{{{{ error }}}}}}', e)
+  Log.error('{{{{{{ error }}}}}}', ctx)
+})
+
+// //////////////////////////////////////////////////
 app.use(logger)
 
-app.get('/api/user-bikes/:uid-:bid$', UBike.get)
-app.get('/api/users/:id$',            User.get)
-app.get('/api/bikes/:id$',            Bike.get)
-
-app.get('/api/user-bikes', UBike.list)
+// ////////////////////////////////////////////////// /api get
 app.get('/api/users',      User.list)
 app.get('/api/bikes',      Bike.list)
+app.get('/api/user-bikes', UBike.list)
 
+app.get(/^.api.users.(?<id>\d+)$/,               User.get)
+app.get(/^.api.bikes.(?<id>\d+)$/,               Bike.get)
+app.get(/^.api.user-bikes.(?<bid>\d+).(?<uid>\d+)$/, UBike.get)
+
+// ////////////////////////////////////////////////// /api post
 app.post(reqPayload)
-
-app.post('/api/user-bikes', UBike.create)
-app.post('/api/users',      User.create)
 app.post('/api/bikes',      Bike.create)
+app.post('/api/users',      User.create)
+app.post('/api/user-bikes', UBike.create)
+app.post('/api/auth/login', User.auth)
 
-// static
-app.get(`/app/.*`,    send('./pub/index.html'))
+// ////////////////////////////////////////////////// echo
+app.post('/api/healtcheck', echo)
+app.get('/api/healtcheck', echo)
 
-app.get('/util/*', statiq())
+// ////////////////////////////////////////////////// static
+app.get(/^\/app\/.*/,    send('./pub/index.html'))
+app.get(/^\/util\/.*/, statiq())
 app.get(statiq('./pub'))
 
-app.listen(port, () => debug('Server started on port', port))
+const server = app.listen(port, () => debug('Server started on port', port))
+
+export { app, server }

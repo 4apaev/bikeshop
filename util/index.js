@@ -35,16 +35,23 @@ export function tmpl(s, a, cb = x => x) {
   return re
 }
 
-tmpl.raw = (s, ...a) => tmpl(s, a).join('')
-
-export function rxpath(s) {
-  return new RegExp(s
-      .replace(/:(\w+)/g, `(?<$1>w+)`)
-      .replace(/(?<!\\)\//g, `\\/`)
-      .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
+export function str2rgx(s, ...a) {
+  let fl = ''
+  let rx = tmpl(s, a, x => Is(RegExp, x)
+    ? x.source
+    : x).join('')
+  rx = rx.replace(/( +)?\n+( +)?/g, '')
+  rx = rx.replace(/\/([gimdsuy]+)\/?$/, (_, f) => echo('', fl += f))
+  return new RegExp(rx, fl)
 }
 
-O.use(Array, {
+O(tmpl, {
+  raw(s, ...a) {
+    return tmpl(s, a).join('')
+  },
+})
+
+O(Array, {
   is(x) {
     return Array.isArray(x)
   },
@@ -56,7 +63,10 @@ O.use(Array, {
   },
 })
 
-O.use(Array.prototype, {
+O(Array.prototype, {
+  has(x) {
+    return this.includes(x)
+  },
   get head() {
     return this[ 0 ]
   },
@@ -68,15 +78,32 @@ O.use(Array.prototype, {
   },
 })
 
-O.use(String.prototype, {
-  get up() {
-    return this.toUpperCase()
-  },
-  get low() {
-    return this.toLowerCase()
+O(String, {
+  rx: str2rgx,
+  is(x) {
+    return typeof x == 'string'
   },
 })
 
-O.alias(Array.prototype, 'head',  String.prototype)
-O.alias(Array.prototype, 'tail',  String.prototype)
-O.alias(Array.prototype, 'uniqe', String.prototype)
+O(String.prototype, {
+  get up() {
+    return this.toUpperCase()
+  },
+
+  get low() {
+    return this.toLowerCase()
+  },
+
+  pad(n, x = ' ') {
+    let fl = 0; let s = String(this)
+    while (n > s.length) {
+      s = (fl ^= 1)
+        ? s + x
+        : x + s
+    }
+    return s
+  },
+})
+
+O.alias(Array.prototype, String.prototype, 'head')
+O.alias(Array.prototype, String.prototype, 'tail')

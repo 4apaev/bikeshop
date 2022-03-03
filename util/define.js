@@ -1,27 +1,31 @@
-
-import Is, { T, raise } from './is.js'
+import Is, { raise } from './is.js'
 
 const µ = null
 const O = Object
 
 export default function use() {
-  if (arguments.length < 2) return O(arguments[ 0 ] ?? µ)
-  let [[ c, e, w ], target ] = T.args(arguments, Is.X, [[], []])
+  if (arguments.length < 2)
+    return O(arguments[ 0 ] ?? µ)
 
-  const src = O.getOwnPropertyDescriptors(target.pop())
-  /*     */ src || raise('[use] missing source')
-  target.length || raise('[use] missing target')
+  let cew = []
+  let trg = []
 
-  for (let k in src) {
-    (src[ k ].get ?? (
-      w != µ && (src[ k ].writable = w)))
-    e != µ && (src[ k ].enumerable = e)
-    c != µ && (src[ k ].configurable = c)
+  for (const a of arguments)
+    [ cew, trg ][ +Is.complex(a) ].push(a)
+
+  const  src = O.getOwnPropertyDescriptors(trg.pop()) // eslint-disable-next-line indent
+         src || raise('[use] missing source')
+  trg.length || raise('[use] missing target')
+                                                      // eslint-disable-next-line brace-style
+  for (let k in src) { (src[ k ].get ?? (
+    cew[ 2 ] != µ && (src[ k ].writable = cew[ 2 ]))) // eslint-disable-next-line indent
+    cew[ 1 ] != µ && (src[ k ].enumerable = cew[ 1 ]) // eslint-disable-next-line indent
+    cew[ 0 ] != µ && (src[ k ].configurable = cew[ 0 ])
   }
 
-  for (const trg of target)
-    O.defineProperties(trg, src)
-  return target[ 0 ]
+  for (const x of trg)
+    O.defineProperties(x, src)
+  return trg[ 0 ]
 }
 
 export function def(a, b, c) {
@@ -43,7 +47,11 @@ export function get(a, b) {
  * alias(src, ...trg, ...props)
  */
 export function alias() {
-  const [ props, target ] = T.args(arguments, Is.X, [[], []])
+  let props = []
+  let target = []
+
+  for (const a of arguments)
+    [ props, target ][ +Is.complex(a) ].push(a)
 
   const key = props.shift()
   const src = target.shift()
@@ -76,7 +84,7 @@ export function each(a, cb, prev) {
 }
 
 export function merge(v, k, params) {
-  if (k in params) {
+  if (params[ k ] != µ) {
     if (Is.a(params[ k ]))
       params[ k ].push(v)
     else
@@ -93,6 +101,7 @@ use.get   = O.get   = get
 use.each  = O.each  = each
 use.alias = O.alias = alias
 use.merge = O.merge = merge
+use.assign = O.assign
 
 export const mix = use.mix   = O.mix   = O.assign
 export const own = use.own   = O.own   = O.hasOwn

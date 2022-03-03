@@ -1,3 +1,5 @@
+/* eslint-disable spaced-comment */
+/* eslint-disable max-len */
 import {
   format,
   inspect,
@@ -32,16 +34,24 @@ function write(soc, s, ...a) {
   soc.write('\n')
 }
 
+console.log('\n========================================')
+console.log(DEBUG)
+console.log('\n========================================')
+
 export function debug(prefix) {
   const head = randBgColor(prefix)
-  const ok = DEBUG == '*' || DEBUG.includes(prefix)
+  const ok = DEBUG.includes(prefix) || DEBUG == '*'
+  console.log('========== DEBUG LOG', DEBUG, ok
+    ? '✅'
+    : '⛔️', prefix, '\n==========')
 
   const fn = ok
     ? (s, ...a) => Log(head, format(s, ...a))
     : () => {}
+
   fn.error = ok
     ? (s, ...a) => Log.error(head, format(s, ...a))
-    : fn
+    : () => {}
   return fn
 }
 
@@ -50,50 +60,28 @@ function use(a, b) {
 }
 
 function randBgColor(x) {
-  const [ a, b ] = randBgColor.pairs[ randBgColor.i++ % randBgColor.pairs.length ]
-  return format(`\x1b[%sm\x1b[%sm %s \x1b[0m`, a, b, x)
+  const i = randBgColor.i++
+  const n = randBgColor.pairs.length
+  const [ a, b ] = randBgColor.pairs[ i % n ]
+  return format(`\x1b[4%sm  \x1b[0m \x1b[4%sm  \x1b[0m %s`, a, b, x)
+  // return format(`\x1b[4%sm[  \x1b[0m \x1b[4%sm  ]\x1b[0m %s ]`, a, b, x)
 }
 
-randBgColor.pairs = [                                                                             // eslint-disable indent
-  [ 40, 31 ], [ 40, 32 ], [ 40, 33 ], [ 40, 34 ], [ 40, 35 ], [ 40, 36 ], [ 40, 37 ],             // eslint-disable indent
-  [ 41, 30 ],             [ 41, 32 ], [ 41, 33 ], [ 41, 34 ],             [ 41, 36 ], [ 41, 37 ], // eslint-disable indent
-  [ 42, 30 ], [ 42, 31 ],             [ 42, 33 ], [ 42, 34 ], [ 42, 35 ],             [ 42, 37 ], // eslint-disable indent
-  [ 43, 30 ], [ 43, 31 ], [ 43, 32 ],             [ 43, 34 ], [ 43, 35 ], [ 43, 36 ],             // eslint-disable indent
-  [ 44, 30 ], [ 44, 31 ], [ 44, 32 ], [ 44, 33 ],                         [ 44, 36 ], [ 44, 37 ], // eslint-disable indent
-  [ 45, 30 ],             [ 45, 32 ], [ 45, 33 ], [ 45, 34 ],             [ 45, 36 ], [ 45, 37 ], // eslint-disable indent
-  [ 46, 30 ], [ 46, 31 ],             [ 46, 33 ], [ 46, 34 ], [ 46, 35 ],             [ 46, 37 ], // eslint-disable indent
-  [ 47, 30 ], [ 47, 31 ], [ 47, 32 ],             [ 47, 34 ], [ 47, 35 ], [ 47, 36 ],
+randBgColor.pairs = [
+  /*
+┌─────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
+│         │  black          │  red            │  green          │  yellow         │  blue           │  magenta        │  cyan           │  white          │
+├─────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
+│   black ❯ */ [ 0, 0 ], /* │ */ [ 0, 1 ], /* │ */ [ 0, 2 ], /* │ */ [ 0, 3 ], /* │ */ [ 0, 4 ], /* │ */ [ 0, 5 ], /* │ */ [ 0, 6 ], /* │ */ [ 0, 7 ], /* │
+│     red │ */ [ 1, 0 ], /* ❯ */ [ 1, 1 ], /* │ */ [ 1, 2 ], /* │ */ [ 1, 3 ], /* │ */ [ 1, 4 ], /* │ */ [ 1, 5 ], /* │ */ [ 1, 6 ], /* │ */ [ 1, 7 ], /* │
+│   green │ */ [ 2, 0 ], /* │ */ [ 2, 1 ], /* ❯ */ [ 2, 2 ], /* │ */ [ 2, 3 ], /* │ */ [ 2, 4 ], /* │ */ [ 2, 5 ], /* │ */ [ 2, 6 ], /* │ */ [ 2, 7 ], /* │
+│  yellow │ */ [ 3, 0 ], /* │ */ [ 3, 1 ], /* │ */ [ 3, 2 ], /* ❯ */ [ 3, 3 ], /* │ */ [ 3, 4 ], /* │ */ [ 3, 5 ], /* │ */ [ 3, 6 ], /* │ */ [ 3, 7 ], /* │
+│    blue │ */ [ 4, 0 ], /* │ */ [ 4, 1 ], /* │ */ [ 4, 2 ], /* │ */ [ 4, 3 ], /* ❯ */ [ 4, 4 ], /* │ */ [ 4, 5 ], /* │ */ [ 4, 6 ], /* │ */ [ 4, 7 ], /* │
+│ magenta │ */ [ 5, 0 ], /* │ */ [ 5, 1 ], /* │ */ [ 5, 2 ], /* │ */ [ 5, 3 ], /* │ */ [ 5, 4 ], /* ❯ */ [ 5, 5 ], /* │ */ [ 5, 6 ], /* │ */ [ 5, 7 ], /* │
+│    cyan │ */ [ 6, 0 ], /* │ */ [ 6, 1 ], /* │ */ [ 6, 2 ], /* │ */ [ 6, 3 ], /* │ */ [ 6, 4 ], /* │ */ [ 6, 5 ], /* ❯ */ [ 6, 6 ], /* │ */ [ 6, 7 ], /* │
+│   white │ */ [ 7, 0 ], /* │ */ [ 7, 1 ], /* │ */ [ 7, 2 ], /* │ */ [ 7, 3 ], /* │ */ [ 7, 4 ], /* │ */ [ 7, 5 ], /* │ */ [ 7, 6 ], /* ❯ */ [ 7, 7 ], /* │
+└─────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
+*/
 ]
 
-randBgColor.i = 0 | Math.random() * randBgColor.pairs.length; [
-  'Black', 'red',
-  'green', 'yellow',
-  'blue',  'magenta',
-  'cyan',  'white',
-].forEach((c, i) => {
-  let a = c[ 0 ]
-  let b = c.toLowerCase()
-  Log[ a ] = Log[ b ] = Log.bind(console, `\x1b[3${ i }sm%s\x1b[39m`)
-})
-
-/*
-
-//var sketch = require('sketch')
-
-console.log('This is an example Sketch script.')
-
-var document = sketch.getSelectedDocument()
-
-var selectedLayers = document.selectedLayers
-var selectedCount = selectedLayers.length
-
-if (selectedCount === 0) {
-  console.log('No layers are selected.')
-} else {
-  console.log('Selected layers:');
-  selectedLayers.forEach(function (layer, i) {
-    console.log((i + 1) + '. ' + layer.name)
-  })
-}
-
-*/
+randBgColor.i = 0 | Math.random() * randBgColor.pairs.length
