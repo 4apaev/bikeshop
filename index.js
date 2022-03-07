@@ -1,4 +1,3 @@
-import Koa from 'koa'
 import { Log } from './util/index.js'
 
 import Router from './wheels/router.js'
@@ -18,10 +17,6 @@ import {
 } from './wheels/middleware.static.js'
 
 import { port } from './config/config.js'
-
-// import { Stream } from 'stream'
-// Is.S = Is.use('stream', x => Is(Stream, x))
-// Is.B = Is.use('buffer', x => Buffer.isBuffer(x))
 
 const debug = Log.debug('app')
 const app = new Router
