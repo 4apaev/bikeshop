@@ -13,7 +13,7 @@ pool.on('error', e => debug(`[pool:error]`, e))
 
 /**
  * @param  {string | pg.QueryArrayConfig<*>} sql
- * @param  {*[]} params
+ * @param  {*[]} [params]
  * @return {Promise<QRes>}
  */
 export default async function query(sql, params) {
