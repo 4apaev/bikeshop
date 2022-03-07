@@ -35,6 +35,14 @@ export default async function query(sql, params) {
 }
 
 /**
+ * @param  {TemplateStringsArray} s
+ * @param  {*[]} a
+ */
+export function tmpl(s, ...a) {
+  return query(String.raw(s, ...a))
+}
+
+/**
  * @param  {string} table
  * @param  {string[]} keys
  * @return {QWhere}
@@ -69,5 +77,7 @@ export function where(table, ...keys) {
  * @typedef {Object} QRes
  * @prop {pg.DatabaseError?} error
  * @prop {pg.QueryResult} result
- * @prop {?} value
+ * @prop {?} value                        *//**
+
+ * @typedef { string | TemplateStringsArray | pg.QueryArrayConfig<*> } SqlStr
  */
