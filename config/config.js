@@ -25,7 +25,7 @@ export const pgconf = {
   database: POSTGRES_DB,
   user    : POSTGRES_USER,
   host    : POSTGRES_HOST,
-  port    : POSTGRES_PORT,
+  port    : +POSTGRES_PORT,
   password: POSTGRES_PASSWORD,
 }
 
