@@ -30,21 +30,35 @@ export default function parse(args) {
   return [ o, defaultArgs ]
 }
 
-export function mergeEnv(text, env = {}) {
-  const lines = text.trim().split('\n')
+export function mergeEnv(str) {
+  let re = {}
+  let prev = undefined
 
-  for (const line of lines) {
-    const [ k, v ] = line.split('=').map(x => x.trim())
-    if (!k || !v) {
-      console.error('bad line', line)
+  for (let next of str.split(/\n+/g)) {
+    if ((next = next.trim()).length === 0)
       continue
-    }
 
-    if (k in env && env[ k ] !== v)
-      console.log('override', k, v)
-    env[ k ] = v
+    let [ k, v ] = next.split('=').map(s => s.trim())
+
+    if (v) {
+      prev = undefined
+      if (k in process.env)
+        console.log('override', k, v)
+
+      re[ k ] = process.env[ k ] = v
+    }
+    else if (prev) {
+      re[ prev ].push(k)
+      process.env[ prev ] = re[ prev ]
+    }
+    else {
+      prev = k
+      if (k in process.env)
+        console.log('override', prev)
+      process.env[ prev ] = re[ prev ] = []
+    }
   }
-  return env
+  return process.env
 }
 
 function fix(o, k) {

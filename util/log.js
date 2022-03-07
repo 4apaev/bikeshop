@@ -1,11 +1,15 @@
 /* eslint-disable spaced-comment */
 /* eslint-disable max-len */
+
+import {
+  BIKESHOP_DEBUG as DEBUG,
+} from '../config/config.js'
+
 import {
   format,
   inspect,
 } from 'util'
 
-const { BIKESHOP_DEBUG: DEBUG = '*' } = process.env
 const µ = null
 
 export default function Log(s, ...a) {

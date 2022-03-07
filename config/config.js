@@ -13,7 +13,7 @@ export const {
   POSTGRES_PORT     = 5432,
   BIKESHOP_PORT     = 3000,
   BIKESHOP_SECRET   = '',
-  BIKESHOP_DEBUG    = '',
+  BIKESHOP_DEBUG    = '*',
   NODE_ENV          = 'dev',
 } = getConfig()
 
@@ -43,7 +43,10 @@ export function readdir(...a) {
 
 function getConfig() {
   try {
-    return mergeEnv(read('.env'), process.env)
+    const str = read('.env')
+    const opt = mergeEnv(str)
+    console.log(opt)
+    return opt
   }
   catch (e) {
     console.error('no .env file found')

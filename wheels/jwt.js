@@ -2,15 +2,16 @@
 import Crypt from 'crypto'
 
 import {
+  BIKESHOP_SECRET as SECRET,
+} from '../config/config.js'
+
+import {
   Log,
 } from '../util/index.js'
 
 const debug = Log.debug('jwt')
 
 const LNK = '.'
-const {
-  BIKESHOP_SECRET: secret,
-} = process.env
 
 /**
  * @param  { string } s
@@ -80,7 +81,7 @@ export function verify(s) {
  * @return {string}
  */
 export function sign(...a) {
-  return Crypt.createHmac('SHA256', secret)
+  return Crypt.createHmac('SHA256', SECRET)
       .update(a.join(LNK))
       .digest('base64')
 }
