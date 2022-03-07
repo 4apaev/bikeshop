@@ -75,7 +75,7 @@ export function where(table, ...keys) {
  * @param {number} [limit=10]            *//**
 
  * @typedef {Object} QRes
- * @prop {pg.DatabaseError?} error
+ * @prop {pg.DatabaseError | Error } [error]
  * @prop {pg.QueryResult} result
  * @prop {?} value                        *//**
 
