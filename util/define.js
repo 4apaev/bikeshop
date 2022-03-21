@@ -40,12 +40,6 @@ export function get(a, b) {
     : O.getOwnPropertyDescriptors(a)
 }
 
-/**
- * @example
- * alias(src, key)
- * alias(src,  ...props)
- * alias(src, ...trg, ...props)
- */
 export function alias() {
   let props = []
   let target = []
