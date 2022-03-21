@@ -8,6 +8,8 @@ import {
 } from 'fs/promises'
 
 import {
+  O,
+  Is,
   Log,
   sanitizePath,
 } from '../util/index.js'
@@ -92,12 +94,13 @@ function ETag(ctx, stat) {
  * @param {URLSearchParams} opts
  */
 export default function compile(filename, fn, opts) {
-
   return Fs.readFile(filename, 'utf-8', (e, css) => e
     ? fn(e)
     : Styl(css, {
       filename,
-      globals: Object.fromEntries(opts),
+      globals: Is(URLSearchParams, opts)
+        ? O.from(opts)
+        : opts ?? {},
     }).render(fn))
 }
 
