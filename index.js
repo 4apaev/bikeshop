@@ -4,6 +4,7 @@ import Router from './wheels/router.js'
 import * as User from './service/user.js'
 import * as Bike from './service/bike.js'
 import * as UBike from './service/user.bikes.js'
+import SSE from './util/scripts/sse.js'
 
 import {
   echo,
@@ -44,6 +45,8 @@ app.on('error', (e, ctx) => {
 // //////////////////////////////////////////////////
 app.use(logger)
 
+// //////////////////////////////////////////////// SSE
+app.get('/api/stream', SSE)
 // ////////////////////////////////////////////////// /api get
 app.get('/api/users',      User.list)
 app.get('/api/bikes',      Bike.list)

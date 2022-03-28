@@ -10,18 +10,19 @@
   <link rel=icon href="/img/favicon.svg"/>
   <link rel=stylesheet type="text/css" href="/css/main.styl">
 
-  <script>
-    const Log = Object.defineProperties(console.log, Object.getOwnPropertyDescriptors(console))
-    window.Log = window.log = globalThis.Log = globalThis.log = Log
-  </script>
-
   <script type="module">
     import O    from '/util/define.js'
     import Is   from '/util/is.js'
     import $    from '/js/dom.js'
     import Sync from '/js/sync.js'
-    Object.assign(window, { O, $, Is, Sync, Log, log: Log })
+    const ctx = window
+    const Log = O(console.log, console)
+
+    const sse = new EventSource('/api/stream')
+    O.assign(ctx, { O, $, Is, Sync, Log, log: Log, sse })
   </script>
+
+  <script type="module" src="/js/sse.js"></script>
 </head>
 
 <body>
