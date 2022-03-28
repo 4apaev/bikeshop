@@ -37,10 +37,11 @@ function write(soc, s, ...a) {
     soc.write(inspect(a[ i++ ]), s.raw[ i ])
   soc.write('\n')
 }
-
-console.log('\n========================================')
-console.log(DEBUG)
-console.log('\n========================================')
+Log`
+❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰ DEBUG ❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰❰
+${ DEBUG }
+❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱ DEBUG ❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱❱
+`
 
 export function debug(prefix) {
   const head = randBgColor(prefix)
