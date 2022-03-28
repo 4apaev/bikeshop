@@ -6,17 +6,8 @@ export default class Fail extends Error {
   message = 'Epic Fail'
   name = 'Fail'
 
-  static as = as
-  static Try = Try
-  static deny = deny
-  static trace = trace
-  static raise = raise
-  static assert = assert
-
   static CODES = {}
   static STATUSES = {}
-
-  static is = x => this[ Symbol.hasInstance ](x)
 
   constructor(e, c) {
     super()
@@ -36,59 +27,47 @@ export default class Fail extends Error {
   }
 
   set(k, v) {
-    return k
-      ? Object.assign(this, typeof k == 'object'
-        ? k
-        : { [ k ]: v })
-      : this
+    return Object.assign(this, Object(k) === k
+      ? k
+      : { [ k ]: v })
   }
 
-}
+  static as = (m, c) => Reflect.construct(this, [ m, c ])
+  static is = x => this[ Symbol.hasInstance ](x)
 
-export function as(m, c) {
-  return new Fail(m, c)
-}
-
-export function deny(m, c) {
-  return Promise.reject(new Fail(m, c))
-}
-
-export function raise(m, c) {
-  throw new Fail(m, c)
-}
-
-export function assert(x, m) {
-  x || raise(m, 'assertation failed')
-}
-
-export function Try(fn, ...a) {
-  try {
-    return [ µ, fn.apply(µ, a) ]
+  static deny = (m, c) => Promise.reject(this.as(m, c))
+  static assert = (x, m) => x || this.raise(m)
+  static raise = (m, c) => {
+    throw this.as(m, c)
   }
-  catch (e) {
-    return [ new Fail(e?.message ?? 'Try failed', e), µ ]
+
+  static Try(fn, ...a) {
+    try {
+      return [ µ, fn.apply(µ, a) ]
+    }
+    catch (e) {
+      return [ this.as(e?.message ?? 'Try failed', e), µ ]
+    }
   }
-}
 
-export function trace(start = trace) {
-  const { prepareStackTrace } = Error
-  Error.prepareStackTrace = callSite // (_, cs) => cs
+  static trace = start => {
+    const prepare = Error.prepareStackTrace
+    Error.prepareStackTrace = (_, s) => s
 
-  const e = new Error
-  Error.captureStackTrace(e, start)
+    const e = new Error
+    Error.captureStackTrace(e, start ?? this.trace)
 
-  const { stack } = e
-  Error.prepareStackTrace = prepareStackTrace
-  return stack // .map(callSite)
-}
+    const { stack } = e
+    Error.prepareStackTrace = prepare
+    return stack.map(cs => ({
+      // cs, x,
+      file: cs.getFileName(),
+      name: cs.getFunctionName(),
+      type: cs.getTypeName(),
+      row: cs.getLineNumber(),
+      col: cs.getColumnNumber(),
 
-function callSite(_, cs) {
-  return {                         // eslint-disable-next-line key-spacing
-    file  : cs.getFileName(),      // eslint-disable-next-line key-spacing
-    row   : cs.getLineNumber(),    // eslint-disable-next-line key-spacing
-    col   : cs.getColumnNumber(),  // eslint-disable-next-line key-spacing
-    fname : cs.getFunctionName(),  // eslint-disable-next-line key-spacing
-    type  : cs.getTypeName(),
+    }))
   }
 }
 
