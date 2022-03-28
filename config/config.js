@@ -6,6 +6,7 @@ import { mergeEnv } from '../util/env.argv.js'
 export const cwd = process.cwd()
 
 export const {
+  NODE_ENV          = 'dev',
   POSTGRES_DB       = 'database',
   POSTGRES_USER     = 'postgres',
   POSTGRES_HOST     = '0.0.0.0',
@@ -14,7 +15,15 @@ export const {
   BIKESHOP_PORT     = 3000,
   BIKESHOP_SECRET   = '',
   BIKESHOP_DEBUG    = '*',
-  NODE_ENV          = 'dev',
+  // [
+  //   'users',
+  //   'bikes',
+  //   'service',
+  //   'service:users',
+  //   'service:bikes',
+  //   'service:user-bikes',
+  //   'middleware',
+  // ],
 } = getConfig()
 
 export const env    = NODE_ENV
