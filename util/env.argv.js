@@ -58,7 +58,7 @@ export function mergeEnv(str) {
       process.env[ prev ] = re[ prev ] = []
     }
   }
-  return process.env
+  return re
 }
 
 function fix(o, k) {
