@@ -90,12 +90,21 @@ export function merge(v, k, params) {
   return params
 }
 
+export function dig(a, b, c) {
+  Is.a(a) || (a = a.split('.'))
+  return a.split('.').every(k => Is.ok(b = b?.[ k ]))
+    ? b
+    : c
+}
+
+use.dig   = O.dig   = dig
 use.use   = O.use   = use
 use.get   = O.get   = get
 use.each  = O.each  = each
 use.alias = O.alias = alias
 use.merge = O.merge = merge
 use.assign = O.assign
+use.from = O.fromEntries
 
 export const mix = use.mix   = O.mix   = O.assign
 export const own = use.own   = O.own   = O.hasOwn
@@ -109,12 +118,5 @@ export const entries = use.entries = O.entries
 use(O, use, {
   get o() {
     return O.create(µ)
-  },
-
-  from(a, b) {
-    return Is.I(a)
-      ? O.fromEntries(a?.entries?.()
-        ?? Array.from(a, b ??= (v, i) => [ i, v ]))
-      : O.entries(a)
   },
 })
