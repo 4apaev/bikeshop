@@ -11,13 +11,6 @@ export {
 }
 
 export const echo = x => x
-export const delay = setTimeout
-delay.clear = clearTimeout
-
-export function sleep(ms) {
-  return new Promise(done => delay(done, ms))
-}
-
 export function sanitizePath(x) {
   return x.split('/').reduce((prev, next) => {
     if (next == '..')
