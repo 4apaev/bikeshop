@@ -4,18 +4,18 @@ import query, { where } from './db.js'
 /** @typedef {import("./db.js").QRes} QRes */
 
 /**
- * @prop   { string } uname
- * @prop   { string } email
+ * @prop   { string } name
+ * @prop   { string } mail
  * @prop   { string } pass
  * @return { Promise<QRes> }
  */
-export function create({ uname, email, pass }) {
+export function create({ name, mail, pass }) {
   return query(`
-  insert into users(uname, email, pass)
+  insert into users(name, mail, pass)
     values($1, $2, crypt($3, gen_salt('bf')))
     returning
-      id, uname, email;
-  `, [ uname, email, pass ])
+      id, name, mail;
+  `, [ name, mail, pass ])
 }
 
 /**
@@ -24,7 +24,7 @@ export function create({ uname, email, pass }) {
  */
 export function get({ id }) {
   return query(`
-    select id, uname, email from users
+    select id, name, mail from users
       where
         id=$1
       limit
@@ -36,22 +36,22 @@ export function get({ id }) {
  * @prop   {object} params
  * @return {Promise<QRes>}
  */
-export const list = where('users', 'id', 'uname', 'email')
+export const list = where('users', 'id', 'name', 'mail')
 
 /**
- * @prop   {string} email
+ * @prop   {string} mail
  * @prop   {string} pass
  * @return {Promise<QRes>}
  */
-export function auth({ email, pass }) {
+export function auth({ mail, pass }) {
   return query(`
-    select id, uname, email from users
+    select id, name, mail from users
       where
-        email = $1
+        mail = $1
       and
         pass = crypt($2, pass)
       limit
         1;
-  `, [ email, pass ])
+  `, [ mail, pass ])
 }
 

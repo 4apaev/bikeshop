@@ -5,15 +5,15 @@ import query, { where } from './db.js'
 
 /**
  * @prop   {string} kind
- * @prop   {string} details
+ * @prop   {string} desc
  * @return {Promise<QRes>}
  */
-export function create({ kind, details }) {
+export function create({ kind, desc }) {
   return query(`
-  insert into bikes(kind, details)
+  insert into bikes("kind", "desc")
     values($1, $2)
     returning *;
-  `, [ kind, details ?? '' ])
+  `, [ kind, desc ?? '' ])
 }
 
 /**
@@ -32,8 +32,8 @@ export function get({ id }) {
 
 /**
  * @prop   {?string} [kind]
- * @prop   {?string} [details]
+ * @prop   {?string} [desc]
  * @prop   {?number} [limit = 10]
  * @return {Promise<QRes>}
  */
-export const list = where('bikes', 'id', 'kind', 'details')
+export const list = where('bikes', 'id', 'kind', 'desc')

@@ -5,18 +5,18 @@ export default class Bikes extends Table {
   title = 'Bikes'
   apiUrl = `/api/bikes`
   createRoute = `/app/bikes/create`
-  // cells = [ 'id', 'kind', 'details' ]
+  // cells = [ 'id', 'kind', 'desc' ]
   cells = [
     { key: 'id', type: 'number', label: 'id'  },
-    { key: 'details', type: 'text', label: 'details' },
+    { key: 'desc', type: 'text', label: 'desc' },
     { key: 'kind', type: 'enum', label: 'kind' },
   ]
 
   fields = [
     {
-      key: 'details',
+      key: 'desc',
       type: 'text',
-      label: 'details',
+      label: 'desc',
       placeholder: 'bike desc',
     },
     {

@@ -10,22 +10,22 @@ export default class Auth extends Base {
       <blockquote/>
 
       <fieldset>
-        <label for=uname>name</label>
+        <label for=name>name</label>
         <input
           required
-          id=uname
-          name=uname
+          id=name
+          name=name
           type=text
           placeholder=alice
         />
       </fieldset>
 
       <fieldset>
-        <label for=email>email</label>
+        <label for=mail>mail</label>
         <input
           required
-          id=email
-          name=email
+          id=mail
+          name=mail
           type=email
           minLength="6"
           placeholder="alice@shoshi.dog"
@@ -80,8 +80,8 @@ export default class Auth extends Base {
 
     try {
       const re = await Sync.post('/api/users', {
-        uname: this.form.uname.value,
-        email: this.form.email.value,
+        name: this.form.name.value,
+        mail: this.form.mail.value,
         pass: this.form.pass.value,
       })
       this.emit('fetch', re.body)

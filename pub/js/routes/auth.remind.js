@@ -7,9 +7,9 @@ export default class Remind extends Form {
   connectedCallback() {
     super.connectedCallback()
     this.appendField({
-      key: 'email',
-      id: 'email',
-      name: 'email',
+      key: 'mail',
+      id: 'mail',
+      name: 'mail',
       type: 'email',
       placeholder: 'alice@shoshi.dog',
       required: true,

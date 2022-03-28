@@ -4,23 +4,23 @@ export default class Users extends Table {
   slug = 'user'
   title = 'Users'
   cells = [
-    { key: 'id', type: 'number', label: 'uid'  },
-    { key: 'uname', type: 'text', label: 'name'  },
-    { key: 'email', type: 'email', label: 'email' },
+    { key: 'id', type: 'number', label: 'id'  },
+    { key: 'name', type: 'text', label: 'name'  },
+    { key: 'mail', type: 'mail', label: 'mail' },
   ]
 
   fields = [
     {
-      key: 'uname',
+      key: 'name',
       type: 'text',
       label: 'name',
       placeholder: 'alice',
       required: true,
     },
     {
-      key: 'email',
-      type: 'email',
-      label: 'email',
+      key: 'mail',
+      type: 'mail',
+      label: 'mail',
       placeholder: 'alice@shoshi.dog',
       required: true,
     },
