@@ -1,6 +1,7 @@
 // @ts-check
 import * as User from '../db/users.js'
 import { Is, Log } from '../util/index.js'
+// import Is from '../util/is_.js'
 import { create as createToken } from '../wheels/jwt.js'
 
 const debug = Log.debug('service:users')
@@ -49,27 +50,27 @@ export async function create(ctx) {
   ctx.type = 'application/json'
 
   const {
-    uname,
-    email,
+    name,
+    mail,
     pass,
   } = ctx?.payload ?? {}
 
-  if (Is.not.s(uname))
+  if (Is.not.s(name))
     return ctx.deny(400, 'invalid name')
 
-  if (Is.not.s(email))
-    return ctx.deny(400, 'invalid email')
+  if (Is.not.s(mail))
+    return ctx.deny(400, 'invalid mail')
 
   if (Is.not.s(pass))
     return ctx.deny(400, 'invalid pass')
 
   // ctx.assert(, 400, 'invalid name')
-  // ctx.assert(, 400, 'invalid email')
+  // ctx.assert(, 400, 'invalid mail')
   // ctx.assert(, 400, 'invalid pass')
 
   const { error, value } = await User.create({
-    uname,
-    email,
+    name,
+    mail,
     pass,
   })
 
@@ -88,15 +89,15 @@ export async function auth(ctx) {
   ctx.status = 200
   ctx.type = 'json'
 
-  const { email, pass } = ctx?.payload ?? {}
+  const { mail, pass } = ctx?.payload ?? {}
 
-  if (Is.not.s(email))
-    return ctx.deny(400, 'invalid email')
+  if (Is.not.s(mail))
+    return ctx.deny(400, 'invalid mail')
 
   if (Is.not.s(pass))
     return ctx.deny(400, 'invalid pass')
 
-  const { error, value } = await User.auth({ email, pass })
+  const { error, value } = await User.auth({ mail, pass })
 
   if (error) {
     debug('CREATE', error)
@@ -111,7 +112,7 @@ export async function auth(ctx) {
 
   const token = createToken({
     id,
-    email,
+    mail,
     date: new Date,
   })
 

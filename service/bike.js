@@ -58,14 +58,14 @@ export async function create(ctx) {
 
   let {
     kind,
-    details,
+    desc,
   } = ctx?.payload ?? {}
 
   Kind.has(kind) || (kind = 'city')
 
   const { error, value } = await Bike.create({
     kind,
-    details,
+    desc,
   })
 
   if (error) {
