@@ -1,13 +1,24 @@
 // @ts-check
-import Fail, { raise, assert } from './fail.js'
+/* eslint-disable comma-spacing */
+import Fail from './fail.js'
 
-const A = Array
-const O = Object
-const µ = null
+export const {
+  deny,
+  raise,
+  assert,
+} = Fail
 
-export { Fail, raise, assert }
+export { Fail }
 
-/** @type {IS} */
+/**
+ * @typedef {import('../_/types/utils.d').IS} IS *//**
+ * @typedef {import('../_/types/utils.d').IT} IT *//**
+ * @typedef {import('../_/types/utils.d').Use} Use *//**
+ * @typedef {import('../_/types/utils.d').IsType} IsType */
+
+/**
+ * @type {IS}
+ */
 export default function Is(a, b, m) {
   let c = T(b)
   return It(m, 'instance', typeof a == 'function'
@@ -15,104 +26,44 @@ export default function Is(a, b, m) {
     : c == a)
 }
 
-Is.u = use('null',        /** @type {isu} */ x => x != µ)
-Is.a = use('array',       /** @type {isa} */ x => Array.isArray(x))
-Is.n = use('number',      /** @type {isn} */ x => Number.isFinite(x))
-Is.i = use('integer',     /** @type {isi} */ x => Number.isInteger(x))
-Is.s = use('string',      /** @type {iss} */ x => typeof x == 'string')
-Is.b = use('boolean',     /** @type {isb} */ x => typeof x == 'boolean')
-Is.f = use('function',    /** @type {isf} */ x => typeof x == 'function')
-Is.o = use('object',      /** @type {iso} */ x => typeof x == 'object' && !!x)
-Is.O = use('Object',      /** @type {isO} */ x => T(x) == 'Object')
-Is.I = use('iterable',    /** @type {isI} */ x => Symbol.iterator in O(x))
-Is.X = use('complexity',  /** @type {isX} */ x => x === O(x))
-Is.raw = use('template',  /** @type {israw} x */ x => Array.isArray(x?.raw))
-Is.eq = use('equality', equal)
+/** @type {Use} */
+export function use(name, fn) {
+  const i = fn.length
+  const [ k, ...alias ] = name.match(/\S+/g)
+  Is[ k ] = i === 1
+    ? (x, m) => It(m, k, fn(x))
+    : i === 2
+      ? (a, b, m) => It(m, k, fn(a, b)) // @ts-ignore
+      : (...a) => It(a[ i ], k, fn(...a))
+  for (const a of alias)
+    Is[ a ] = Is[ k ]
+}
 
-/**
- * @param   {*} a
- * @param   {*} b
- * @returns {boolean}
- */
-function equal(a, b) {
-  if (a === b)
+export function T(x) {
+  return toString.call(x).slice(8, -1)
+}
+
+/** @type {IT} */
+function It(m, name, x) {
+  const { not, fail } = It
+  It.not = It.fail = false
+
+  if (x !== not)
     return true
 
-  let t = T(a)
-  if (t != T(b))
-    return false
+  fail && raise(m ?? not
+    ? 'unexpected ' + name
+    :   'expected ' + name)
 
-  if (t == 'Object') {
-    t = 'Array'
-    a = O.entries(a)
-    b = O.entries(b)
-  }
-
-  else if (t == 'Set' || t == 'Map') {
-    t = 'Array'
-    a = A.from(a)
-    b = A.from(b)
-  }
-
-  return t == 'Array'
-    ? a.length !== b.length
-      ? false
-      : a.every((/** @type {*} */ x, /** @type {number} */ i) =>
-        equal(x, b[ i ]))
-    : String(a) === String(b)
-}
-
-Is.equal = Is.eql = Is.eq
-Is.complex = Is.x = Is.X
-Is.iterable = Is.itr = Is.I
-
-//////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @param  {string} name
- * @param  {function} fn
- * @return {isIt}
- */
-export function use(name, fn) {
-  assert(typeof fn == 'function', `[is.use]: not a function "${ name }"`)
-  const i = fn.length
-  return i === 1
-    ? (x, m) => It(m, name, fn(x))
-    : i === 2
-      ? (a, b, m) => It(m, name, fn(a, b))
-      : (...a) => It(a[ i ], name, fn(...a))
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @param  {string} m
- * @param  {string} name
- * @param  {boolean} x
- * @throws {Fail}
- * @return {boolean}
- */
-function It(m, name, x) {
-  const { not = false, fail = false } = It
-  It.not  =  It.fail  = false
-  if (x !== not)  return true
-
-  fail && raise(m ?? `${ not
-    ? 'not'
-    : '' } expected ${ name }`)
   return false
 }
 
-It.not = false
-It.fail = false
+It.not = It.fail = false /* for typescript */
+Is.use = use             /* for typescript */
+// Is.not = Is.assert = Is  /* for typescript */
 
-//////////////////////////////////////////////////////////////////////////////////////
-// for typescript...
-Is.not = Is
-Is.assert = Is
-
-O.defineProperties(Is, O.getOwnPropertyDescriptors({
-  T, Fail, raise, use,
+Object.defineProperties(Is, Object.getOwnPropertyDescriptors({
+  use,
   get not() {
     It.not = true
     return Is
@@ -123,111 +74,33 @@ O.defineProperties(Is, O.getOwnPropertyDescriptors({
   },
 }))
 
-//////////////////////////////////////////////////////////////////////////////////////
+/* * *
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    * * *  USE  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * * */
 
-/**
- * @param  {?} x
- * @return {string}
- */
-export function T(x) {
-  return toString.call(x).slice(8, -1)
-}
+use('integer  i int'    , Is.i = Number.isInteger)
+use('number   n num'    , Is.n = Number.isFinite)
+use('array    a arr'    , Is.a = Array.isArray)
+use('string   s str'    , Is.s = x => typeof x == 'string')
+use('boolean  b bool'   , Is.b = x => typeof x == 'boolean')
+use('function f fn'     , Is.f = x => typeof x == 'function')
+use('object   o obj'    , Is.o = x => typeof x == 'object' && !!x)
+use('Error    e err'    , Is.e = x => Error[ Symbol.hasInstance ](x))
+use('Object   O Obj'    , Is.O = x => T(x) == 'Object')
+use('complex  x cmplx'  , Is.x = x => x === Object(x))
+use('iterable I itr'    , Is.I = x => Symbol.iterator in Object(x))
+use('ok'                , x => x != null)
+use('template tmpl'     , x => Array.isArray(x?.raw))
+use('equal    eq eql'   , function equal(a, b, t) {
+  if (a === b)                  return true
+  if ((t = T(a)) != T(b))       return false
+  if (t == 'Array')             return a.length === b.length && a.every((x, i) => equal(x, b[ i ]))
+  if (t == 'Object')            return equal(Object.entries(a), Object.entries(b))
+  if (t == 'Set' || t == 'Map') return equal(Array.from(a), Array.from(b))
+  else                          return String(a) === String(b)
+})
 
-/**
- * @template P
- * @param  {Iterable<*>} args
- * @param  {typeof T} cb
- * @param  {P | *} prev
- * @return {P}
- */
-T.args = (args, cb = T, prev = {}) => {
-  for (let next of args) {
-    let k = cb(next)
-    ;(prev[ Is.b(k) // @ts-ignore
-      ? k = +k
-      : k ] ??= []).push(next)
-  }
-  return prev
-}
-
-/**
- * @typedef {(a: string | Function, b: any, m?: string) => boolean} IS
- * @prop {withMessage} u
- * @prop {withMessage} a
- * @prop {withMessage} n
- * @prop {withMessage} i
- * @prop {withMessage} s
- * @prop {withMessage} b
- * @prop {withMessage} f
- * @prop {withMessage} o
- * @prop {withMessage} O
- * @prop {withMessage} I
- * @prop {withMessage} X
- * @prop {withMessage} raw
- * @prop {withMessage} eq
- * @prop {withMessage} itr
- * @prop {IS} not
- * @prop {IS} assert
- *//**
- * @callback check
- * @param {*} x
- * @return {boolean}
- *//**
- * @callback withMessage
- * @param {*} x
- * @param {string=} m
- * @return {boolean}
- *//**
- * @callback isIt
- * @param {*} x
- * @param {string=} m
- * @return {boolean}
- *//**
- * @callback isu
- * @param {*} x
- * @return {x is !undefined}
- *//**
- * @callback isa
- * @param {*} x
- * @return {x is Array}
- *//**
- * @callback isn
- * @param {*} x
- * @return {x is number}
- *//**
- * @callback isi
- * @param {*} x
- * @return {x is number}
- *//**
- * @callback iss
- * @param {*} x
- * @return {x is string}
- *//**
- * @callback isb
- * @param {*} x
- * @return {x is boolean}
- *//**
- * @callback isf
- * @param {*} x
- * @return {x is function}
- *//**
- * @callback iso
- * @param {*} x
- * @return {x is object}
- *//**
- * @callback isO
- * @param {*} x
- * @return {x is Object}
- *//**
- * @callback isI
- * @param {*} x
- * @return {x is Iterable}
- *//**
- * @callback isX
- * @param {*} x
- * @return {x is (object | function)}
- *//**
- * @callback israw
- * @param {*} x
- * @return {x is TemplateStringsArray}
- */
