@@ -105,10 +105,10 @@ export default class Sync {
     if (body == null)
       return this
 
-    if (is(HTMLFormElement, body)) 
+    if (is(HTMLFormElement, body))
       body = Object.fromEntries(new FormData(body))
 
-    else if (is(FormData, body)) 
+    else if (is(FormData, body))
       body = Object.fromEntries(body)
 
     if (is.o(body)) {
