@@ -39,36 +39,13 @@ O.use(JQ, {
   },
 
   text() {
-    return doc.createTextNode.apply(doc, arguments) 
+    return doc.createTextNode.apply(doc, arguments)
   },
   attr() {
-    return doc.createAttribute.apply(doc, arguments) 
+    return doc.createAttribute.apply(doc, arguments)
   },
   comment() {
-    return doc.createComment.apply(doc, arguments) 
-  },
-
-  proxy(el) {
-    return Px.set(el, Proxy.revocable(el, {
-      has(el, k) {
-        return el.hasAttribute(camel2snake(k))
-      },
-
-      get(el, k) {
-        const x = el.getAttribute(camel2snake(k))
-        return x === ''
-          ? true
-          : x
-      },
-
-      set(el, k, v) {
-        const key = camel2snake(k)
-        if (typeof v == 'boolean' || v == null)
-          return el.toggleAttribute(key, !!v)
-        el.setAttribute(key, v)
-        return true
-      },
-    })).get(el)
+    return doc.createComment.apply(doc, arguments)
   },
 
   create(name, props, ...children) {
