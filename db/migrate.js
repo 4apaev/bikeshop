@@ -6,9 +6,9 @@ const debug = Log.debug('migrate')
 const BASE_DIR = 'db/sql'
 
 const dir = readdir(BASE_DIR)
-  .filter(a => a.endsWith('.sql'))
-  .sort((a, b) => +a.match(/^\d+/) - b.match(/^\d+/))
-  .values()
+    .filter(a => a.endsWith('.sql'))
+    .sort((a, b) => +a.match(/^\d+/) - b.match(/^\d+/))
+    .values()
 
 /**
  * start queue
