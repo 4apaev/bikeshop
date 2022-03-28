@@ -48,7 +48,7 @@ export function tmpl(s, ...a) {
  * @return {QWhere}
  */
 export function where(table, ...keys) {
-  const head = `select ${ keys.join(', ') } from ${ table }`
+  const head = `select "${ keys.join('", "') }" from ${ table }`
 
   return (props, limit) => {
     let i = 0
