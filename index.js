@@ -1,23 +1,22 @@
 import { Log } from './util/index.js'
+import { port } from './config/config.js'
 
-import Router from './wheels/router.js'
 import * as User from './service/user.js'
 import * as Bike from './service/bike.js'
 import * as UBike from './service/user.bikes.js'
-import SSE from './util/scripts/sse.js'
 
+import SSE from './wheels/sse.js'
+import Router from './wheels/router.js'
 import {
   echo,
   logger,
   reqPayload,
 } from './wheels/middleware.js'
 
-import {
-  send,
-  statiq,
-} from './wheels/middleware.static.js'
-
-import { port } from './config/config.js'
+// import {
+//   send,
+//   statiq,
+// } from './wheels/middleware.static.js'
 
 const debug = Log.debug('app')
 const app = new Router
@@ -33,9 +32,9 @@ function deny(c, e) {
     error: true,
     message: String(e),
   }
+  debug('Deny', e?.message)
 }
 app.context.deny = deny
-// O.use(app.context, { deny })
 
 app.on('error', (e, ctx) => {
   Log.error('{{{{{{ error }}}}}}', e)
@@ -64,14 +63,20 @@ app.post('/api/user-bikes', UBike.create)
 app.post('/api/auth/login', User.auth)
 
 // ////////////////////////////////////////////////// echo
-app.post('/api/healtcheck', echo)
-app.get('/api/healtcheck', echo)
+app.get('/healtcheck', echo)
 
 // ////////////////////////////////////////////////// static
-app.get(/^\/app\/.*/,    send('./pub/index.html'))
-app.get(/^\/util\/.*/, statiq())
-app.get(statiq('./pub'))
+const cwd = process.cwd()
 
-const server = app.listen(port, () => debug('Server started on port', port))
+// app.get(/^\/app\/.*/,    send(cwd + '/pub/index.html'))
+// app.get(/^\/util\/.*/, statiq(cwd))
+// app.get(statiq(cwd + '/pub', { '/': '/index.html' }))
+
+const server = app.listen(port, () => {
+  Log`
+  Server started on port ${ port }
+  CWD ${ cwd }
+  `
+})
 
 export { app, server }
