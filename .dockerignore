@@ -1,0 +1,12 @@
+.c8rc
+.DS_Store
+.eslintrc.yml
+.git
+.github
+.gitignore
+.vscode
+node_modules
+_
+
+# data
+# tests

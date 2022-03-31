@@ -37,8 +37,8 @@ rules:
     - error
     - args: after-used
       caughtErrors: none
-      argsIgnorePattern: ^_
-      varsIgnorePattern: ^_
+      argsIgnorePattern: ^_|Koa
+      varsIgnorePattern: ^_|Koa
 
   no-useless-computed-key:
     - error

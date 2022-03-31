@@ -4,22 +4,32 @@ Inner Tube
 Cooperative bicycle workshop
 
 
-# connect to container
-docker exec -it {container_name} psql -U {POSTGRES_USER}
+# container
+```
+docker exec -it db psql -U $POSTGRES_USER
+docker exec -it $POSTGRES_HOST psql -U $POSTGRES_USER
+docker exec -it ${container_name:db} psql -U $POSTGRES_USER
+```
 
-# or connect to db
-docker exec -it tube psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+# connect
+`docker exec -it db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"`
 
 # list dbs
-\l
+`\l`
 
 # connect to db
-\c {POSTGRES_DB}
+`\c {POSTGRES_DB}`
 
-# list db tables
-\dt
+# list tables
+`\dt`
 
-# query (dont forget semi at the end)
-select * from "users";
+# clean images
+```
+docker rmi -f $(docker images -a -q)
+```
 
 
+# docker exec
+```
+docker exec -it  bikeshop sh <
+```
