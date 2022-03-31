@@ -20,6 +20,7 @@ export default class Fail extends Error {
       this.message = 'rethrow: ' + e.message
       this.cause = e.cause ?? e
       this.stack += '\n\n' + e.stack
+      this.code ??= this.cause?.code ?? Fail.STATUSES[ e.message ] ?? 0
     }
     else if (e) {
       this.message = e in Fail.CODES
