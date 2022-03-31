@@ -14,4 +14,4 @@ COPY .env               /bikeshop/.env
 
 RUN npm ci --production
 
-CMD [ "npm", "start" ]
+CMD [ "node", "index.js" ]

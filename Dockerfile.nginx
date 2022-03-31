@@ -1,0 +1,22 @@
+FROM nginx:alpine
+
+
+ARG SITE_NAME=garage.dog
+ARG SITE_DIR=/var/www/${SITE_NAME}/html
+
+RUN mkdir -p ${SITE_DIR}
+COPY pub ${SITE_DIR}
+COPY util ${SITE_DIR}
+COPY util ${SITE_DIR}/util
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# RUN chown -R $USER:$USER /var/www/example.com/html
+# RUN chmod -R 755 /var/www
+
+# VOLUME /usr/share/nginx/html
+# VOLUME /etc/nginx
+
+
+
+
+

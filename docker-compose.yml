@@ -1,45 +1,73 @@
+version: "3"
 services:
-
-  bikeshop:
-    image: node:alpine
-    container_name: bikeshop
-    env_file: .env
-    build: .
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-    networks:
-      - public
-      - private
-
   db:
     container_name: db
     image: postgres:alpine
+    restart: always
     env_file: .env
     ports:
       - 5432:5432
-    restart: always
     volumes:
-      - db-data:/var/lib/postgresql
+      - ./data/db:/var/lib/postgresql/data
     networks:
-      - private
+      private:
+
+  bikeshop:
+    container_name: bikeshop
+    image: bikeshop:latest
+    env_file: .env
+    build:
+      context: .
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    networks:
+      public:
+      private:
+    volumes:
+      # - .:/bikeshop
+      - pub:/bikeshop/pub
+      - util:/bikeshop/util
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://localhost/healtcheck" ]
+    #   interval: 1m
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+
+  proxy:
+    container_name: proxy
+    build:
+      dockerfile: Dockerfile.nginx
+    ports:
+      - 80:80
+    depends_on:
+      - bikeshop
+    networks:
+      public:
 
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4:latest
+    restart: always
     env_file: .env
-    depends_on:
-      - db
     ports:
       - 5050:80
-    restart: always
+    depends_on:
+      - db
     networks:
-      - public
-      - private
+      private:
+
+volumes:
+  pub:
+  util:
+  data-db:
 
 networks:
   public:
   private:
-volumes:
-  db-data:
+
+
+
+
