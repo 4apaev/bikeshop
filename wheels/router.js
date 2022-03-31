@@ -1,66 +1,48 @@
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
-import { O, Is } from '../util/index.js'
+import { Is } from '../util/index.js'
 
 export default class Router extends Koa {
-  /**
-   * @param { string | RegExp | Koa.Middleware } url
-   * @param { Koa.Middleware } [cb]
-   */
+  /** @type {Route} */
   get(url, cb) {
     this.mware('GET', url, cb)
   }
 
-  /**
-   * @param { string | RegExp | Koa.Middleware } url
-   * @param { Koa.Middleware } [cb]
-   */
+  /** @type {Route} */
   del(url, cb) {
     this.mware('DELETE', url, cb)
   }
 
-  /**
-   * @param { string | RegExp | Koa.Middleware } url
-   * @param { Koa.Middleware } [cb]
-   */
+  /** @type {Route} */
   put(url, cb) {
     this.mware('PUT', url, cb)
   }
 
-  /**
-   * @param { string | RegExp | Koa.Middleware } url
-   * @param { Koa.Middleware } [cb]
-   */
+  /** @type {Route} */
   post(url, cb) {
     this.mware('POST', url, cb)
   }
 
   mware() {
-    /** @type { Koa.Middleware } */
-    let cb
 
-    /** @type { isRoute[] } */
-    const argv = []
+    /** @type {Koa.Middleware} */ let cb
+    const argv /** @type {isRoute[]} */ = []
 
     for (const a of arguments) {
-      if (Is.f(a)) {
+      if (typeof a == 'function') {
         cb = a
       }
-
-      // @ts-ignore
-      else if (Is(RegExp, a)) {
-        argv.push(rxparams(a))
-      }
-
-      else if (Is.s(a)) {
+      else if (typeof a == 'string') {
         argv.push(isHttpMethod(a)
-          ? ctx => ctx.method === a.up
+          ? ctx => ctx.method === a.toUpperCase()
           : ctx => ctx.path === a)
+      }
+      else if (RegExp[ Symbol.hasInstance ](a)) {
+        argv.push(rxparams(a))
       }
     }
 
-    // @ts-ignore
     Is.assert.f(cb, 'missing route callback')
 
     this.use(/** @type {Koa.Middleware} */ (ctx, next) =>
@@ -68,7 +50,6 @@ export default class Router extends Koa {
         ? cb(ctx, next)
         : next())
   }
-
 }
 
 /**
@@ -79,14 +60,14 @@ export function rxparams(rx) {
   // rx.global || (rx = new RegExp(rx.source, 'g'))
   return ctx => {
     const match = ctx.path.match(rx)
-    O.assign(ctx.params, match?.groups)
+    Object.assign(ctx.params, match?.groups)
     return !!match
   }
 }
 
 /**
- * @param { string } str
- * @return { isRoute }
+ * @param  {string} str
+ * @return {isRoute}
  */
 export function rxpath(str) {
   const rx = new RegExp(str
@@ -97,8 +78,8 @@ export function rxpath(str) {
 }
 
 /**
- * @param { string } x
- * @return { boolean }
+ * @param  {string} x
+ * @return {boolean}
  */
 function isHttpMethod(x) {
   return Http.METHODS.includes(x.toUpperCase())
@@ -106,11 +87,10 @@ function isHttpMethod(x) {
 
 /**
  * @callback Route
- * @param {string | RegExp | Koa.Middleware} url
- * @param {Koa.Middleware} [cb]
- * @return {boolean}
+ * @param  {Koa.Middleware|RegExp|string} url
+ * @param  {Koa.Middleware} [cb]
  *//**
  * @callback isRoute
- * @param {Koa.Context} ctx
+ * @param  {Koa.Context} ctx
  * @return {boolean}
  */

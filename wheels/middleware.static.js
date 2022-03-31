@@ -19,8 +19,8 @@ import * as Mim from '../util/mim.js'
 const debug = Log.debug('static')
 
 /**
- * @param  {string} [base]
- * @param  {{[x: string]: string;}} [dict]
+ * @param  {string=} base
+ * @param  {{[k: string]: string;}} [dict]
  * @return {Mware}
  */
 export function statiq(base, dict) {
@@ -90,7 +90,7 @@ function ETag(ctx, stat) {
 
 /**
  * @param {string} filename
- * @param {{ (e?: Error, css?: string): void }} fn
+ * @param {{(e?: Error, css?: string): void}} fn
  * @param {URLSearchParams} opts
  */
 export default function compile(filename, fn, opts) {
