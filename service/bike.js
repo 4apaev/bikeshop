@@ -1,8 +1,8 @@
 // @ts-check
 import * as Bike from '../db/bikes.js'
-import { Is, Log } from '../util/index.js'
+import { Is } from '../util/index.js'
+import request, { assert } from './db.request.js'
 
-const debug = Log.debug('service:bikes')
 const Kind = new Set([
   'city',
   'road',
@@ -14,69 +14,33 @@ const Kind = new Set([
 ])
 
 /** @type {Mware} */
-export async function get(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
-  const id = +ctx?.params?.id
-
-  if (Is.not.n(id))
-    return ctx.deny(400, 'invalid id')
-
-  const { error, value } = await Bike.get({ id })
-
-  if (error) {
-    debug('GET', error)
-    ctx.throw(400, error)
-  }
-  else {
-    ctx.body = value[ 0 ]
-  }
-}
+export const get = request('Bikes.Get', ctx => {
+  let id = +ctx?.params?.id
+  assert(Is.n(id = +id), 400, 'invalid bike id')
+  return Bike.get({ id })
+})
 
 /** @type {Mware} */
-export async function list(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
-  const query = Object.fromEntries(ctx.URL.searchParams || [])
-  const { error, value } = await Bike.list(query)
-
-  if (error) {
-    debug('LIST', error)
-    ctx.throw(400, error)
-  }
-  else {
-    ctx.body = value
-  }
-}
+export const list = request('Bikes.List', ctx => {
+  const q = Object.fromEntries(ctx.URL?.searchParams ?? [[ 'limit', 10 ]])
+  return Bike.list(q)
+})
 
 /** @type {Mware} */
-export async function create(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
+export const create = request('Bikes.Create', ctx => {
   let {
-    kind,
-    desc,
+    desc = '',
+    kind = 'city',
   } = ctx?.payload ?? {}
 
-  Kind.has(kind) || (kind = 'city')
+  assert(Is.s(desc), 400, 'invalid bike desc')
+  assert(Kind.has(kind), 400, 'invalid bike kind')
 
-  const { error, value } = await Bike.create({
-    kind,
-    desc,
-  })
-
-  if (error) {
-    debug('CREATE', error)
-    ctx.throw(400, error)
-  }
-  else {
-    ctx.body = { value }
-  }
-}
+  return Bike.create({ kind, desc })
+})
 
 /**
  * @typedef {import('koa').Middleware} Mware
+ *//**
+ * @typedef {import('koa').Context} Context
  */

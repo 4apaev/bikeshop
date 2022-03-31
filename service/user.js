@@ -1,114 +1,53 @@
 // @ts-check
 import * as User from '../db/users.js'
-import { Is, Log } from '../util/index.js'
-// import Is from '../util/is_.js'
 import { create as createToken } from '../wheels/jwt.js'
-
-const debug = Log.debug('service:users')
-
-/** @type {Mware} */
-export async function get(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
-  const id = +ctx?.params?.id
-
-  if (Is.not.n(id))
-    return ctx.deny(400, 'invalid id')
-
-  const { error, value } = await User.get({ id })
-
-  if (error) {
-    debug('GET', error)
-    return ctx.deny(400, error)
-  }
-  else {
-    ctx.body = value[ 0 ]
-  }
-}
+import { Is } from '../util/index.js'
+import request, { assert } from './db.request.js'
 
 /** @type {Mware} */
-export async function list(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
-  const query = Object.fromEntries(ctx.URL.searchParams || [])
-  const { error, value } = await User.list(query)
-
-  if (error) {
-    debug('LIST', error)
-    return ctx.deny(400, error)
-  }
-  else {
-    ctx.body = value
-  }
-}
+export const get = request('Users.Get', ctx => {
+  let id = +ctx?.params?.id
+  assert(Is.n(id = +id), 400, 'invalid user id')
+  return User.get({ id })
+})
 
 /** @type {Mware} */
-export async function create(ctx) {
-  ctx.status = 200
-  ctx.type = 'application/json'
+export const list = request('Users.List', ctx => {
+  const q = Object.fromEntries(ctx.URL?.searchParams ?? [[ 'limit', 10 ]])
+  return User.list(q)
+})
 
-  const {
+/** @type {Mware} */
+export const create = request('Users.Create', ctx => {
+  let {
     name,
     mail,
     pass,
   } = ctx?.payload ?? {}
 
-  if (Is.not.s(name))
-    return ctx.deny(400, 'invalid name')
+  assert(Is.s(name), 400, 'invalid user name')
+  assert(Is.s(mail), 400, 'invalid user mail')
+  assert(Is.s(pass), 400, 'invalid user pass')
 
-  if (Is.not.s(mail))
-    return ctx.deny(400, 'invalid mail')
-
-  if (Is.not.s(pass))
-    return ctx.deny(400, 'invalid pass')
-
-  // ctx.assert(, 400, 'invalid name')
-  // ctx.assert(, 400, 'invalid mail')
-  // ctx.assert(, 400, 'invalid pass')
-
-  const { error, value } = await User.create({
-    name,
-    mail,
-    pass,
-  })
-
-  if (error) {
-    debug('CREATE', error)
-    ctx.deny(400, error)
-  }
-  else {
-    ctx.body = { value }
-  }
-
-}
+  return User.create({ name, mail, pass })
+})
 
 /** @type {Mware} */
-export async function auth(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
+export const auth = request('Users.auth', async ctx => {
+  let {
+    mail,
+    pass,
+  } = ctx?.payload ?? {}
 
-  const { mail, pass } = ctx?.payload ?? {}
-
-  if (Is.not.s(mail))
-    return ctx.deny(400, 'invalid mail')
-
-  if (Is.not.s(pass))
-    return ctx.deny(400, 'invalid pass')
+  assert(Is.s(mail), 400, 'invalid user name')
+  assert(Is.s(pass), 400, 'invalid user pass')
 
   const { error, value } = await User.auth({ mail, pass })
-
-  if (error) {
-    debug('CREATE', error)
-    return ctx.deny(401, error)
-  }
+  if (error)
+    return { error, value }
 
   const id = value?.[ 0 ]?.id
-  if (!id) {
-    debug('CREATE', error)
-    return ctx.deny(401, 'invalid credentials')
-  }
+  assert(id, 401, 'invalid user credentials')
 
   const token = createToken({
     id,
@@ -121,9 +60,12 @@ export async function auth(ctx) {
     overwrite: true,
   })
 
-  ctx.body = { token }
-}
+  return { code: 200, value: { token }}
+
+})
 
 /**
  * @typedef {import('koa').Middleware} Mware
+ *//**
+ * @typedef {import('koa').Context} Context
  */

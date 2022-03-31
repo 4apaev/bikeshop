@@ -1,57 +1,25 @@
 // @ts-check
 
 import * as UserBike from '../db/user.bikes.js'
-import { Is, Log } from '../util/index.js'
-
-const debug = Log.debug('service:user-bikes')
+import { Is } from '../util/index.js'
+import request, { assert } from './db.request.js'
 
 /** @type {Mware} */
-export async function get(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
+export const get = request('User.Bikes.Get', ctx => {
   let { uid, bid } = ctx?.params ?? {}
-
-  try {
-    Is.assert.n(uid = +uid, 'invalid user id')
-    Is.assert.n(bid = +bid, 'invalid bike id')
-  }
-  catch (e) {
-    return ctx.throw(400, e)
-  }
-
-  const { error, value } = await UserBike.get({ uid, bid })
-
-  if (error) {
-    ctx.throw(400, error)
-    debug('GET', error)
-  }
-  else {
-    ctx.body = value[ 0 ]
-  }
-}
+  assert(Is.n(uid = +uid), 400, 'invalid user id')
+  assert(Is.n(bid = +bid), 400, 'invalid bike id')
+  return UserBike.get({ uid, bid })
+})
 
 /** @type {Mware} */
-export async function list(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-  const q = Object.fromEntries(ctx.URL?.searchParams ?? [])
-  const { error, value } = await UserBike.list(q)
-
-  if (error) {
-    debug('LIST', error)
-    ctx.throw(400, error)
-  }
-  else {
-    ctx.body = value
-  }
-}
+export const list = request('Users.Bikes.List', ctx => {
+  const q = Object.fromEntries(ctx.URL?.searchParams ?? [[ 'limit', 10 ]])
+  return UserBike.list(q)
+})
 
 /** @type {Mware} */
-export async function create(ctx) {
-  ctx.status = 200
-  ctx.type = 'json'
-
+export const create = request('Users.Bikes.Create', ctx => {
   let {
     uid,
     bid,
@@ -59,33 +27,19 @@ export async function create(ctx) {
     checkout,
   } = ctx?.payload ?? {}
 
-  try {
-    Is.assert.n(uid = +uid, 'invalid user id')
-    Is.assert.n(bid = +bid, 'invalid bike id')
-    Is.assert.n(Date.parse(checkin), 'invalid checkin date')
-    Is.assert.n(Date.parse(checkin), 'invalid checkin date')
-  }
-  catch (e) {
-    return ctx.throw(400, e)
-  }
+  assert(Is.n(uid = +uid), 400, 'invalid user id')
+  assert(Is.n(bid = +bid), 400, 'invalid bike id')
 
-  const { error, value } = await UserBike.create({
+  return UserBike.create({
     uid,
     bid,
     checkin,
     checkout,
   })
-
-  if (error) {
-    debug('CREATE', error)
-    ctx.throw(400, error)
-  }
-  else {
-    ctx.body = { value }
-  }
-
-}
+})
 
 /**
  * @typedef {import('koa').Middleware} Mware
+ *//**
+ * @typedef {import('koa').Context} Context
  */
