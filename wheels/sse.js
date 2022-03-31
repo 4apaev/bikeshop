@@ -13,7 +13,7 @@ import { O, Is } from '../util/index.js'
 import { period } from '../util/date.js'
 // import { debounce } from '../util/promise.js'
 
-const DELAY = 20000
+const DELAY = 3000
 const cwd = process.cwd()
 
 export const Evt = new Emitter
@@ -28,9 +28,9 @@ function watcher(event, data) {
 
 // debounce(watcher)
 
-Fs.watch(cwd + '/pub',  {
-  recursive: true,
-}, watcher)
+Fs.watch(cwd + '/pub', cwd == '/bikeshop'
+  ? {}
+  : { recursive: true }, watcher)
 
 /** @type {Koa.Middleware} */
 export default async function SSERoute(ctx) {
