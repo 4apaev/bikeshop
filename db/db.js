@@ -16,22 +16,50 @@ pool.on('error', e => debug(`[pool:error]`, e))
  * @param  {*[]} [params]
  * @return {Promise<QRes>}
  */
-export default async function query(sql, params) {
+export async function _query(sql, params) {
   let error, result
 
   try {
     result = await pool.query(sql, params)
+    return {
+      error,
+      result,
+      value: result?.rows ?? [],
+    }
   }
 
   catch (e) {
-    Log.error('[db:error]', error = e)
+    Log.error('[db:error]', e)
+    return {
+      error: e,
+      result,
+      value: [],
+    }
   }
+}
 
-  return {
-    error,
-    result,
-    value: result?.rows ?? [],
-  }
+export default async function query(sql, params) {
+
+  return new Promise((done, fail) => {
+    pool.query(sql, params, (error, result) => {
+      if (error) {
+        Log.error('[db:error]', error)
+        fail({
+          error,
+          result,
+          value: [],
+        })
+      }
+      else {
+        done({
+          error,
+          result,
+          value: result?.rows ?? [],
+        })
+      }
+    })
+  })
+
 }
 
 /**
