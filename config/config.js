@@ -4,17 +4,18 @@ import Path from 'path'
 import { mergeEnv } from '../util/env.argv.js'
 
 export const cwd = process.cwd()
+export const isContainer = cwd === '/bikeshop'
 
 export const {
-  NODE_ENV          = 'dev',
-  POSTGRES_DB       = 'database',
-  POSTGRES_USER     = 'postgres',
-  POSTGRES_HOST     = '0.0.0.0',
-  POSTGRES_PASSWORD = '',
-  POSTGRES_PORT     = 5432,
-  BIKESHOP_PORT     = 3000,
-  BIKESHOP_SECRET   = '',
-  BIKESHOP_DEBUG    = '*',
+  POSTGRES_DB,
+  POSTGRES_USER,
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_PASSWORD,
+  BIKESHOP_SECRET = '',
+  BIKESHOP_DEBUG = '*',
+  BIKESHOP_PORT = 3000,
+  NODE_ENV = 'dev',
   // [
   //   'users',
   //   'bikes',
@@ -54,6 +55,9 @@ function getConfig() {
   try {
     const str = read('.env')
     const opt = mergeEnv(str)
+    opt.POSTGRES_HOST = isContainer
+      ? 'db'
+      : 'localhost',
     console.log(opt)
     return opt
   }
