@@ -1,6 +1,6 @@
 // @ts-check
 import * as Mim from '../util/mim.js'
-import { O, Is, Log } from '../util/index.js'
+import { O, Log } from '../util/index.js'
 import * as format from '../util/date.js'
 import crypto from 'crypto'
 
@@ -34,12 +34,8 @@ export async function logger(ctx, next) {
 
 /** @type {Mware} */
 export function echo(ctx) {
-  let { payload = {}} = ctx
-  if (Is.not.o(payload))
-    payload = { payload }
-  payload.uptime = format.period(process.uptime() * 1000)
   ctx.status = 200
-  ctx.body = payload
+  debug('HEALTCHECK', ctx.body = format.period(process.uptime() * 1000).join())
 }
 
 /** @type {Mware} */
