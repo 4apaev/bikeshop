@@ -4,7 +4,6 @@ import is from '/util/is.js'
 const µ = null
 const A = Array
 const E = new WeakMap
-const Px = new WeakMap
 const STOP = Symbol('📛')
 const doc = document
 
@@ -135,7 +134,7 @@ O.use(Element.prototype, {
   attr(k, v) {
     const i = arguments.length
     if (i === 0) {
-      return O.too(A.from(this.attributes, a => [ a.name, a.value === ''
+      return O.from(A.from(this.attributes, a => [ a.name, a.value === ''
         ? true
         : a.value ]))
     }
