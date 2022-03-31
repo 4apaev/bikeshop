@@ -11,13 +11,29 @@ export const {
 export { Fail }
 
 /**
- * @typedef {import('../_/types/utils.d').IS} IS *//**
- * @typedef {import('../_/types/utils.d').IT} IT *//**
- * @typedef {import('../_/types/utils.d').Use} Use *//**
- * @typedef {import('../_/types/utils.d').IsType} IsType */
+ * @typedef {(x: any, m?: string) => boolean} TypeIs */
 
 /**
- * @type {IS}
+ * @typedef {(a: any, m?: string) => boolean} TIs */
+
+/**
+ * @typedef {(a: any, b: any, m?: string) => boolean} TwoTypeIs */
+
+/**
+ * <T>
+ * param {*} [a]
+ * param {*} [b]
+ * param {string} [m]
+ * return {is typeof T}
+ */
+
+/**
+ * @parse
+ * @template T
+ * @param {T} a
+ * @param {*=} b
+ * @param {string=} m
+ * @return {b is typeof T}
  */
 export default function Is(a, b, m) {
   let c = T(b)
@@ -26,7 +42,10 @@ export default function Is(a, b, m) {
     : c == a)
 }
 
-/** @type {Use} */
+/**
+ * @param {string} name
+ * @param {TypeIs} fn
+ */
 export function use(name, fn) {
   const i = fn.length
   const [ k, ...alias ] = name.match(/\S+/g)
@@ -43,7 +62,7 @@ export function T(x) {
   return toString.call(x).slice(8, -1)
 }
 
-/** @type {IT} */
+/** @type {import('./utils.js').IT} */
 function It(m, name, x) {
   const { not, fail } = It
   It.not = It.fail = false
@@ -58,12 +77,13 @@ function It(m, name, x) {
   return false
 }
 
+Is.T = T
+Is.use = use
+Is.not /** @type { typeof Is } */ = Is
+Is.assert /** @type { typeof Is } */ = Is
 It.not = It.fail = false /* for typescript */
-Is.use = use             /* for typescript */
-// Is.not = Is.assert = Is  /* for typescript */
 
 Object.defineProperties(Is, Object.getOwnPropertyDescriptors({
-  use,
   get not() {
     It.not = true
     return Is
@@ -82,19 +102,19 @@ Object.defineProperties(Is, Object.getOwnPropertyDescriptors({
   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * */
 
-use('integer  i int'    , Is.i = Number.isInteger)
-use('number   n num'    , Is.n = Number.isFinite)
-use('array    a arr'    , Is.a = Array.isArray)
-use('string   s str'    , Is.s = x => typeof x == 'string')
-use('boolean  b bool'   , Is.b = x => typeof x == 'boolean')
-use('function f fn'     , Is.f = x => typeof x == 'function')
-use('object   o obj'    , Is.o = x => typeof x == 'object' && !!x)
-use('Error    e err'    , Is.e = x => Error[ Symbol.hasInstance ](x))
-use('Object   O Obj'    , Is.O = x => T(x) == 'Object')
-use('complex  x cmplx'  , Is.x = x => x === Object(x))
-use('iterable I itr'    , Is.I = x => Symbol.iterator in Object(x))
-use('ok'                , x => x != null)
-use('template tmpl'     , x => Array.isArray(x?.raw))
+use('integer  i int'    , Is.i = /** @type {TypeIs} */ (x, _) => Number.isInteger(x))
+use('number   n num'    , Is.n = /** @type {TypeIs} */ (x, _) => Number.isFinite(x))
+use('array    a arr'    , Is.a = /** @type {TypeIs} */ (x, _) => Array.isArray(x))
+use('string   s str'    , Is.s = /** @type {TypeIs} */ (x, _) => typeof x == 'string')
+use('boolean  b bool'   , Is.b = /** @type {TypeIs} */ (x, _) => typeof x == 'boolean')
+use('function f fn'     , Is.f = /** @type {TypeIs} */ (x, _) => typeof x == 'function')
+use('object   o obj'    , Is.o = /** @type {TypeIs} */ (x, _) => typeof x == 'object' && !!x)
+use('Error    e err'    , Is.e = /** @type {TypeIs} */ (x, _) => Error[ Symbol.hasInstance ](x))
+use('Object   O Obj'    , Is.O = /** @type {TypeIs} */ (x, _) => T(x) == 'Object')
+use('complex  x cmplx'  , Is.x = /** @type {TypeIs} */ (x, _) => x === Object(x))
+use('iterable I itr'    , Is.I = /** @type {TypeIs} */ (x, _) => Symbol.iterator in Object(x))
+use('ok'                , x =>   /** @type {TypeIs} */ (x, _) != null)
+use('template tmpl'     , x =>   /** @type {TypeIs} */ Array.isArray(x?.raw))
 use('equal    eq eql'   , function equal(a, b, t) {
   if (a === b)                  return true
   if ((t = T(a)) != T(b))       return false

@@ -1,7 +1,30 @@
+/* eslint-disable max-len */
 import Is, { raise } from './is.js'
 
 const µ = null
 const O = Object
+Symbol.stop = Symbol('📛')
+
+export const {
+  own: hasOwn,
+  assign: mix,
+  fromEntries: from,
+  entries,
+  values,
+  keys,
+} = O
+
+export function set(a, b, c) {
+  return c
+    ? O.defineProperty(a, b, c)
+    : O.defineProperties(a, b)
+}
+
+export function get(a, b) {
+  return b
+    ? O.getOwnPropertyDescriptor(a, b)
+    : O.getOwnPropertyDescriptors(a)
+}
 
 export default function use() {
   if (arguments.length < 2)
@@ -13,8 +36,8 @@ export default function use() {
   for (const a of arguments)
     [ cew, trg ][ +Is.complex(a) ].push(a)
 
-  const  src = O.getOwnPropertyDescriptors(trg.pop()) // eslint-disable-next-line indent
-         src || raise('[use] missing source')
+  const  src = get(trg.pop())
+  src || raise('[use] missing source')
   trg.length || raise('[use] missing target')
                                                       // eslint-disable-next-line brace-style
   for (let k in src) { (src[ k ].get ?? (
@@ -23,21 +46,8 @@ export default function use() {
     cew[ 0 ] != µ && (src[ k ].configurable = cew[ 0 ])
   }
 
-  for (const x of trg)
-    O.defineProperties(x, src)
+  for (const x of trg) set(x, src)
   return trg[ 0 ]
-}
-
-export function def(a, b, c) {
-  return c
-    ? O.defineProperty(a, b, c)
-    : O.defineProperties(a, b)
-}
-
-export function get(a, b) {
-  return b
-    ? O.getOwnPropertyDescriptor(a, b)
-    : O.getOwnPropertyDescriptors(a)
 }
 
 export function alias() {
@@ -53,66 +63,59 @@ export function alias() {
   key || raise('[alias] not found')
   src || raise('[alias] source not found')
 
-  const desc = O.getOwnPropertyDescriptor(src, key)
+  const desc = get(src, key)
 
   if (props.length === 0)
-    target.forEach(trg => O.defineProperty(trg, key, desc))
-
+    target.forEach(trg => set(trg, key, desc))
   else if (target.length === 0)
-    props.forEach(p => O.defineProperty(src, p, desc))
-
+    props.forEach(p => set(src, p, desc))
   else
-    props.forEach(p => target.forEach(trg => O.defineProperty(trg, p, desc)))
-
-  return desc
+    props.forEach(p => target.forEach(trg => set(trg, p, desc)))
 }
 
-export function each(a, cb, prev) {
-  const stop = Symbol('📛')
-  for (let [ next, v ] of a?.entries?.() ?? O.entries(a)) {
-    prev = cb(v, next, prev, stop)
-    if (prev === stop)
-      break
+export function each(a, cb, memo, ctx = this) {
+  for (let [ k, v ] of a?.entries?.() ?? entries(a)) {
+    let re = cb.call(ctx, v, k, memo, Symbol.stop)
+    if (re === Symbol.stop) break
+    memo = re
   }
-  return prev
+  return memo
 }
 
-export function merge(v, k, params) {
-  if (params[ k ] != µ) {
-    if (Is.a(params[ k ]))
-      params[ k ].push(v)
-    else
-      params[ k ] = v
-  }
-  else {
-    params[ k ] = v
-  }
-  return params
-}
+mix(each, {                                                                                  // eslint-disable-next-line brace-style
+  kvm(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, k, v, m), memo) }, // eslint-disable-next-line brace-style
+  kmv(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, k, m, v), memo) }, // eslint-disable-next-line brace-style
+  vkm(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, v, k, m), memo) }, // eslint-disable-next-line brace-style
+  vmk(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, v, m, k), memo) }, // eslint-disable-next-line brace-style
+  mkv(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, m, k, v), memo) }, // eslint-disable-next-line brace-style
+  mvk(o, fx, memo, ctx = this) { return each(o, (v, k, m) => fx.call(ctx, m, v, k), memo) },
+})
 
 export function dig(a, b, c) {
-  Is.a(a) || (a = a.split('.'))
-  return a.split('.').every(k => Is.ok(b = b?.[ k ]))
+  return a.split('.').every(k => b = b?.[ k ] ?? 0)
     ? b
     : c
 }
 
-use.dig   = O.dig   = dig
-use.use   = O.use   = use
-use.get   = O.get   = get
-use.each  = O.each  = each
-use.alias = O.alias = alias
-use.merge = O.merge = merge
-use.assign = O.assign
-use.from = O.fromEntries
+dig.set = (a, b, c, tail = a.pop()) => ((
+  a.reduce((o, k, i) =>
+    o = o[ k ]
+    ?? (o[ k ] = Is.n(+a[ i + 1 ])
+      ? []
+      : {}), b)[ tail ] = c), b)
 
-export const mix = use.mix   = O.mix   = O.assign
-export const own = use.own   = O.own   = O.hasOwn
-export const too = use.too   = O.too   = O.fromEntries
+use.get = get
+use.set = set
+use.dig = dig
+use.use = use
+use.each = each
+use.alias = alias
 
-export const keys    = use.keys    = O.keys
-export const values  = use.values  = O.values
-export const entries = use.entries = O.entries
+use.keys = keys
+use.values = values
+use.entries = entries
+use.assign = use.mix = mix
+use.from = use.fromEntries = from
 
 // since "from" appears to be reserved keyword
 use(O, use, {

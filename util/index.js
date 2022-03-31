@@ -10,6 +10,14 @@ export {
   Fail,
 }
 
+export const {
+  raise,
+  assert,
+  trace,
+  deny,
+  Try,
+} = Fail
+
 export const echo = x => x
 export function sanitizePath(x) {
   return x.split('/').reduce((prev, next) => {
@@ -22,81 +30,33 @@ export function sanitizePath(x) {
 }
 
 export function tmpl(s, a, cb = x => x) {
+  if (!Is.a(s?.raw))
+    return
+
   let re = [ s.raw[ 0 ] ]
   for (let i = 0; i < a.length;)
     re = re.concat(cb(a[ i++ ]), s.raw[ i ])
   return re
 }
+tmpl.raw = (s, ...a) => tmpl(s, a).join('')
 
-export function str2rgx(s, ...a) {
-  let fl = ''
-  let rx = tmpl(s, a, x => Is(RegExp, x)
-    ? x.source
-    : x).join('')
-  rx = rx.replace(/( +)?\n+( +)?/g, '')
-  rx = rx.replace(/\/([gimdsuy]+)\/?$/, (_, f) => echo('', fl += f))
-  return new RegExp(rx, fl)
+export function fill(i, cb = x => x) {
+  const a = Array(i)
+  for (; i--;) a[ i ] = cb(i)
+  return a
 }
 
-O(tmpl, {
-  raw(s, ...a) {
-    return tmpl(s, a).join('')
-  },
-})
+export function uniqe() {
+  return Array.from(new Set(this))
+}
 
-O(Array, {
-  is(x) {
-    return Array.isArray(x)
-  },
+export function rgx(s) {
+  let fl = ''
+  return new RegExp((Is.a(s?.raw)
+    ? String.raw.apply(String, arguments)
+    : s)
+      .replace(/( +)?\n+( +)?/g, '')
+      .replace(/\/([gimdsuy]+)\/?$/, (_, f) => (
+        fl += f, '')), fl)
+}
 
-  fill(i, cb = x => x) {
-    const a = Array(i)
-    for (; i--;) a[ i ] = cb(i)
-    return a
-  },
-})
-
-O(Array.prototype, {
-  has(x) {
-    return this.includes(x)
-  },
-  get head() {
-    return this[ 0 ]
-  },
-  get tail() {
-    return this.at(-1)
-  },
-  get uniqe() {
-    return Array.from(new Set(this))
-  },
-})
-
-O(String, {
-  rx: str2rgx,
-  is(x) {
-    return typeof x == 'string'
-  },
-})
-
-O(String.prototype, {
-  get up() {
-    return this.toUpperCase()
-  },
-
-  get low() {
-    return this.toLowerCase()
-  },
-
-  pad(n, x = ' ') {
-    let fl = 0; let s = String(this)
-    while (n > s.length) {
-      s = (fl ^= 1)
-        ? s + x
-        : x + s
-    }
-    return s
-  },
-})
-
-O.alias(Array.prototype, String.prototype, 'head')
-O.alias(Array.prototype, String.prototype, 'tail')

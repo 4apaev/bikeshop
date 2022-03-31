@@ -1,13 +1,17 @@
 const µ = null
 
+/**
+ * @extends {Error}
+ * implements {Error}
+ */
 export default class Fail extends Error {
-  code
-  cause
-  message = 'Epic Fail'
-  name = 'Fail'
+  /** @type {any}    */ cause
+  /** @type {number} */ code = 0
+  /** @type {string} */ message = 'Epic Fail'
+  /** @type {string} */ name = 'Fail'
 
-  static CODES = {}
-  static STATUSES = {}
+  static /** @type {{ [ k: number]: string }} */ CODES = {}
+  static /** @type {{ [ k: string]: number }} */ STATUSES = {}
 
   constructor(e, c) {
     super()
