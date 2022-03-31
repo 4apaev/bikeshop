@@ -1,0 +1,173 @@
+a {
+  color: #519ae4;
+}
+a:focus,
+a:hover {
+  color: #6cb6ff;
+}
+input,
+button {
+  padding: 0 1em;
+  line-height: 2;
+  transition: all 0.25s;
+  border-radius: 3px;
+  color: #adbac7;
+  border: 1px solid rgba(205,215,230,0.2);
+  background-color: #303841;
+}
+input:focus,
+button:focus {
+  border: 1px solid rgba(205,215,230,0.3);
+}
+input:hover,
+button:hover {
+  border: 1px solid rgba(205,215,230,0.4);
+}
+input:not(:placeholder-shown):valid {
+  border-color: #9be9a8;
+}
+input:not(:placeholder-shown):invalid {
+  border-color: #ff5874;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+}
+.btn.ok {
+  color: #40c463;
+  border-color: #40c463;
+}
+.btn.ok.active {
+  color: #9be9a8;
+  border-color: #9be9a8;
+}
+.btn.ok:hover {
+  color: #30a14e;
+  border-color: #30a14e;
+}
+.btn.info {
+  color: #519ae4;
+  border-color: #519ae4;
+}
+.btn.info.active {
+  color: #6cb6ff;
+  border-color: #6cb6ff;
+}
+.btn.info:hover {
+  color: #3781ca;
+  border-color: #3781ca;
+}
+.btn.warn {
+  color: #ffc501;
+  border-color: #ffc501;
+}
+.btn.warn.active {
+  color: #ffee4a;
+  border-color: #ffee4a;
+}
+.btn.warn:hover {
+  color: #fe9600;
+  border-color: #fe9600;
+}
+.btn.err {
+  color: #f0415e;
+  border-color: #f0415e;
+}
+.btn.err.active {
+  color: #ff5874;
+  border-color: #ff5874;
+}
+.btn.err:hover {
+  color: #df2e4b;
+  border-color: #df2e4b;
+}
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-radius: 3px;
+  padding: 0;
+  border: 1px solid #adbac7;
+}
+.btn-group button {
+  border: none;
+  border-radius: 0;
+}
+.btn-group button:not(:first-child) {
+  box-shadow: inset 1px 0 0 #adbac7;
+}
+form {
+  color: #adbac7;
+}
+form blockquote {
+  margin: 1em;
+  padding: 1em;
+  font-style: italic;
+  border-left: 4px solid #9be9a8;
+  font-size: 16px;
+}
+form blockquote:empty {
+  display: none;
+}
+form blockquote.err {
+  border-left-color: #ff5874;
+}
+form header .title {
+  line-height: 3;
+  padding: 0 1em;
+  font-size: 1.25em;
+  text-transform: capitalize;
+}
+form main {
+  box-shadow: inset 0 1px 0 rgba(205,215,230,0.1), inset 0 -1px 0 rgba(205,215,230,0.1);
+}
+form fieldset {
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 1px 0 rgba(205,215,230,0.1);
+}
+form fieldset:last-child {
+  box-shadow: inset 0 1px 0 rgba(205,215,230,0.1), inset 0 -1px 0 rgba(205,215,230,0.1);
+}
+form fieldset label {
+  padding: 0 1em;
+  line-height: 2;
+  text-align: right;
+  flex: 1;
+}
+form fieldset label + input,
+form fieldset label + select {
+  flex: 3;
+}
+form select {
+  cursor: pointer;
+  color: #adbac7;
+  border: 1px solid rgba(205,215,230,0.2);
+  border-radius: 3px;
+  display: inline-block;
+  padding: 0 4em 0 1em;
+  line-height: 2em;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-color: #303841;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(205,215,230,0.2) 50%), linear-gradient(135deg, rgba(205,215,230,0.2) 50%, transparent 50%), linear-gradient(to right, rgba(205,215,230,0.2), rgba(205,215,230,0.1));
+  background-position: calc(100% - 1rem) 50%, calc(100% - 0.7rem) 50%, calc(100% - 2rem) 0;
+  background-size: 5px 5px, 5px 5px, 1px 2rem;
+}
+form select:hover,
+form select:focus {
+  border: 1px solid rgba(205,215,230,0.4);
+  background-image: linear-gradient(45deg, transparent 50%, rgba(205,215,230,0.4) 50%), linear-gradient(135deg, rgba(205,215,230,0.4) 50%, transparent 50%), linear-gradient(to right, rgba(205,215,230,0.4), rgba(205,215,230,0.4));
+}
+form footer {
+  display: flex;
+  height: 4em;
+  padding: 1em;
+  align-items: center;
+  justify-content: space-between;
+}

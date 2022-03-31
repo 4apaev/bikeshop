@@ -1,0 +1,24 @@
+.tabs .tabs-head {
+  padding: 0 1rem;
+  line-height: 4;
+  box-shadow: 0 1px 0 rgba(205,215,230,0.1);
+}
+.tabs .tab {
+  display: none;
+}
+.tabs .tab:target {
+  padding: 1rem;
+  display: block;
+}
+.tabs .tab legend,
+.tabs .tab label,
+.tabs .tab input {
+  display: block;
+  margin-bottom: 1em;
+}
+.tabs .tab legend {
+  font-weight: bold;
+  margin-bottom: 1em;
+  text-transform: capitalize;
+  text-decoration: underline;
+}

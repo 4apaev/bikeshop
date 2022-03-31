@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures;
+  font-feature-settings: 'tnum';
+  scroll-behavior: smooth;
+}
+body {
+  height: 100%;
+}
+ol,
+li,
+ul {
+  list-style: none;
+}
+form,
+label,
+legend,
+fieldset,
+a,
+button,
+input,
+select,
+textarea {
+  border: 0;
+  outline: 0;
+  line-height: normal;
+}
+form:focus,
+label:focus,
+legend:focus,
+fieldset:focus,
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+a,
+button {
+  cursor: pointer;
+  text-decoration: none;
+}
+dialog {
+  position: fixed;
+}
