@@ -8,21 +8,18 @@
   <title>BikeShop</title>
 
   <link rel=icon href="/img/favicon.svg"/>
-  <link rel=stylesheet type="text/css" href="/css/main.styl">
+  <link rel=stylesheet type="text/css" href="/css/main.css">
 
   <script type="module">
     import O    from '/util/define.js'
     import Is   from '/util/is.js'
     import $    from '/js/dom.js'
+    import sse  from '/js/sse.js'
     import Sync from '/js/sync.js'
-    const ctx = window
+
     const Log = O(console.log, console)
-
-    const sse = new EventSource('/api/stream')
-    O.assign(ctx, { O, $, Is, Sync, Log, log: Log, sse })
+    O.mix(window, { O, $, Is, Sync, Log, log: Log, sse })
   </script>
-
-  <script type="module" src="/js/sse.js"></script>
 </head>
 
 <body>

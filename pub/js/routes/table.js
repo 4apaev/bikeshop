@@ -10,7 +10,7 @@ export default class Table extends Base {
   #form
   #dialog
 
-  css = `@import url('/css/table.styl?uid=${ this.uid }')`
+  css = `@import url('/css/table.css?uid=${ this.uid }')`
 
   cells = []
   fields = []
@@ -50,7 +50,7 @@ export default class Table extends Base {
 
   connectedCallback() {
     super.connectedCallback()
-
+    this.classList.add('ws-table')
     this.on('click', '.btn.create', this.toggleDialog)
     this.on('click', 'button.close', (e, stop) => (this.dialog.close(), stop))
 
@@ -71,7 +71,7 @@ export default class Table extends Base {
     const { frag } = $
     const form = this.$('ws-form')
 
-    for (const row of body) {
+    for (const row of body?.value ?? body) {
       const tr = $.tr()
       for (const x of this.cells)
         tr.append($.td(µ, row[ x.key ]))

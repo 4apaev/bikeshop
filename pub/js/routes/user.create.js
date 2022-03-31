@@ -3,7 +3,7 @@ import Sync from '../sync.js'
 import Base from '../comp/form.js'
 
 export default class Auth extends Base {
-  css = `@import url('/css/auth.styl?margin=0&uid=${ this.uid }')`
+  css = `@import url('/css/auth.css?margin=0&uid=${ this.uid }')`
   tmpl = `
     <form>
       <legend>sign up</legend>

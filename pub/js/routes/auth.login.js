@@ -6,7 +6,7 @@ import Form from '/js/comp/form.js'
 // import Auth from '/js/routes/user.create.js'
 
 export default class Login extends Form {
-  // css = `@import url('/css/auth.styl?margin=2em&uid=${ this.uid }')`
+  // css = `@import url('/css/auth.css?margin=2em&uid=${ this.uid }')`
 
   title = 'Login'
   apiurl = '/api/user/auth'
