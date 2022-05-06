@@ -35,7 +35,7 @@ export async function logger(ctx, next) {
 /** @type {Mware} */
 export function echo(ctx) {
   ctx.status = 200
-  debug('HEALTCHECK', ctx.body = format.period(process.uptime() * 1000).join())
+  debug('HEALTCHECK', ctx.body = format.uptime().join())
 }
 
 /** @type {Mware} */

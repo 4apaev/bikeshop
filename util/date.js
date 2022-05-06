@@ -48,3 +48,6 @@ export function period(ms) {
   return buf
 }
 
+export function uptime() {
+  return period(process.uptime() * 1000)
+}
