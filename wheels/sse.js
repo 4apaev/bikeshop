@@ -26,7 +26,7 @@ function watcher(event, data) {
 
 // debounce(watcher)
 
-Fs.watch(cwd + '/pub', cwd == '/bikeshop'
+Fs.watch(cwd + '/pub', cwd == '/backend'
   ? {}
   : { recursive: true }, watcher)
 

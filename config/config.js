@@ -3,7 +3,7 @@ import Fs from 'fs'
 import Path from 'path'
 
 export const cwd = process.cwd()
-export const isContainer = cwd === '/bikeshop'
+export const isContainer = cwd === '/backend'
 
 export const {
   POSTGRES_DB,

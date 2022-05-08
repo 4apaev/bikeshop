@@ -1,16 +1,16 @@
 FROM node:alpine
-WORKDIR /bikeshop
+WORKDIR /backend
 
-COPY db                 /bikeshop/db
-COPY pub                /bikeshop/pub
-COPY util               /bikeshop/util
-COPY wheels             /bikeshop/wheels
-COPY service            /bikeshop/service
-COPY config             /bikeshop/config
-COPY index.js           /bikeshop/index.js
-COPY package.json       /bikeshop/package.json
-COPY package-lock.json  /bikeshop/package-lock.json
-COPY .env               /bikeshop/.env
+COPY db                 /backend/db
+COPY pub                /backend/pub
+COPY util               /backend/util
+COPY wheels             /backend/wheels
+COPY service            /backend/service
+COPY config             /backend/config
+COPY index.js           /backend/index.js
+COPY package.json       /backend/package.json
+COPY package-lock.json  /backend/package-lock.json
+COPY .env               /backend/.env
 
 RUN npm ci --production
 

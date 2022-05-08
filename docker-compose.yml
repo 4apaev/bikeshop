@@ -12,9 +12,9 @@ services:
     networks:
       private:
 
-  bikeshop:
-    container_name: bikeshop
-    image: bikeshop:latest
+  backend:
+    container_name: backend
+    image: backend:latest
     env_file: .env
     build:
       context: .
@@ -26,9 +26,9 @@ services:
       public:
       private:
     volumes:
-      # - .:/bikeshop
-      - pub:/bikeshop/pub
-      - util:/bikeshop/util
+      # - .:/backend
+      - pub:/backend/pub
+      - util:/backend/util
     # healthcheck:
     #   test: [ "CMD", "curl", "-f", "http://localhost/healtcheck" ]
     #   interval: 1m
@@ -43,7 +43,7 @@ services:
     ports:
       - 80:80
     depends_on:
-      - bikeshop
+      - backend
     networks:
       public:
 
