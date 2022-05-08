@@ -7,12 +7,8 @@ import {
   stat as Stats,
 } from 'fs/promises'
 
-import {
-  O,
-  Is,
-  Log,
-  sanitizePath,
-} from '../util/index.js'
+import Is from '../util/is.js'
+import Log from '../util/log.js'
 
 import * as Mim from '../util/mim.js'
 
@@ -99,7 +95,7 @@ export default function compile(filename, fn, opts) {
     : Styl(css, {
       filename,
       globals: Is(URLSearchParams, opts)
-        ? O.from(opts)
+        ? Object.fromEntries(opts)
         : opts ?? {},
     }).render(fn))
 }
@@ -122,3 +118,13 @@ export function compileAsync(filename, opts) {
  * @typedef {import('koa').Context} Context  */ /**
  * @typedef {import('koa').Middleware} Mware */ /**
  */
+
+function sanitizePath(x) {
+  return x.split('/').reduce((prev, next) => {
+    if (next == '..')
+      prev.pop()
+    else if (next != '.')
+      prev.push(next)
+    return prev
+  }, []).join('/')
+}

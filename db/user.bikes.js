@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 // @ts-check
-import { Is, Log } from '../util/index.js'
 import query, { where } from './db.js'
 
 /** @typedef {import("./db.js").QRes} QRes */

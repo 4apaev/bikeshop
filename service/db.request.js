@@ -1,5 +1,6 @@
 // @ts-check
-import { Log, Fail } from '../util/index.js'
+import Log from '../util/log.js'
+import Fail from '../util/fail.js'
 
 const debug = Log.debug('service.request')
 

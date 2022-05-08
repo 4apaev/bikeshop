@@ -1,6 +1,6 @@
 // @ts-check
 import * as Bike from '../db/bikes.js'
-import { Is } from '../util/index.js'
+import Is from '../util/is.js'
 import request, { assert } from './db.request.js'
 
 const Kind = new Set([

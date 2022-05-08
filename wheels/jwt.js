@@ -5,9 +5,7 @@ import {
   BIKESHOP_SECRET as SECRET,
 } from '../config/config.js'
 
-import {
-  Log,
-} from '../util/index.js'
+import Log from '../util/log.js'
 
 const debug = Log.debug('jwt')
 

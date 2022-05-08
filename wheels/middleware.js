@@ -1,14 +1,13 @@
 // @ts-check
-import * as Mim from '../util/mim.js'
-import { O, Log } from '../util/index.js'
-import * as format from '../util/date.js'
 import crypto from 'crypto'
+import * as Mim from '../util/mim.js'
+import Log from '../util/log.js'
+
+import * as format from '../util/date.js'
 
 const debug = Log.debug('middleware')
 
-/**
- * @typedef {import("koa").Middleware} Mware
- */
+/** @typedef {import("koa").Middleware} Mware */
 
 export const methods = new Set([
   'POST',
@@ -19,8 +18,8 @@ export const methods = new Set([
 
 /** @type {Mware} */
 export async function logger(ctx, next) {
-  const start = Date.now() // @ts-ignore
-  ctx.params = O.o
+  const start = Date.now()
+  ctx.params = {}
   ctx.id = crypto.randomUUID()
 
   await next()

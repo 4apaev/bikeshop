@@ -1,6 +1,6 @@
 import { read, readdir } from '../config/config.js'
-import { Log } from '../util/index.js'
 import { pool } from './db.js'
+import Log from '../util/log.js'
 
 const debug = Log.debug('migrate')
 const BASE_DIR = 'db/sql'

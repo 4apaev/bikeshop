@@ -1,7 +1,7 @@
 // @ts-check
+import Is from '../util/is.js'
 import * as User from '../db/users.js'
 import { create as createToken } from '../wheels/jwt.js'
-import { Is } from '../util/index.js'
 import request, { assert } from './db.request.js'
 
 /** @type {Mware} */

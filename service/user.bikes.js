@@ -1,7 +1,7 @@
 // @ts-check
 
 import * as UserBike from '../db/user.bikes.js'
-import { Is } from '../util/index.js'
+import Is from '../util/is.js'
 import request, { assert } from './db.request.js'
 
 /** @type {Mware} */

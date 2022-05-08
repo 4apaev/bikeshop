@@ -1,6 +1,5 @@
 // @ts-check
 import Fs from 'fs'
-import Koa from 'koa'
 import Emitter from 'events'
 import {
   format as frmt,
@@ -9,9 +8,8 @@ import {
   Transform,
 } from 'stream'
 
-import { O, Is } from '../util/index.js'
+import Is from '../util/is.js'
 import { period } from '../util/date.js'
-// import { debounce } from '../util/promise.js'
 
 const DELAY = 3000
 const cwd = process.cwd()
@@ -32,7 +30,7 @@ Fs.watch(cwd + '/pub', cwd == '/bikeshop'
   ? {}
   : { recursive: true }, watcher)
 
-/** @type {Koa.Middleware} */
+/** @type {import('koa').Middleware} */
 export default async function SSERoute(ctx) {
   ctx.request.socket.setTimeout(0)
   ctx.req.socket.setNoDelay(true)
@@ -91,7 +89,7 @@ function transform(chunk, enc, cb) {
 export function format(msg) {
   const re = Is.s(msg)
     ? frmt('data: %s\n', msg)
-    : O.each(msg, (v, k, re) => re += frmt('%s: %j\n', k, v), '')
+    : Object.keys(msg).reduce((re, k) => re + frmt('%s: %j\n', k, msg[ k ]), '')
   return re + '\n\n'
 }
 
