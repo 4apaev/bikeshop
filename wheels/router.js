@@ -1,96 +1,61 @@
 // @ts-check
 import Koa from 'koa'
 import Http from 'http'
-import { Is } from '../util/index.js'
 
-export default class Router extends Koa {
-  /** @type {Route} */
-  get(url, cb) {
-    this.mware('GET', url, cb)
-  }
+/** @typedef {(ctx: Koa.Context) => boolean } MatchRoute */
+/** @typedef {(url: Koa.Middleware|RegExp|string, cb: import('./middleware.js').Mware) => void } Route */
 
-  /** @type {Route} */
-  del(url, cb) {
-    this.mware('DELETE', url, cb)
-  }
+/** @implements {Koa} */
+export default class Router extends Koa {                               // eslint-disable-next-line brace-style
+  /** @type {Route} */ get(url, cb)  { this.handle('GET', url, cb) }    // eslint-disable-next-line brace-style
+  /** @type {Route} */ del(url, cb)  { this.handle('DELETE', url, cb) } // eslint-disable-next-line brace-style
+  /** @type {Route} */ put(url, cb)  { this.handle('PUT', url, cb) }    // eslint-disable-next-line brace-style
+  /** @type {Route} */ post(url, cb) { this.handle('POST', url, cb) }
 
-  /** @type {Route} */
-  put(url, cb) {
-    this.mware('PUT', url, cb)
-  }
-
-  /** @type {Route} */
-  post(url, cb) {
-    this.mware('POST', url, cb)
-  }
-
-  mware() {
-
-    /** @type {Koa.Middleware} */ let cb
-    const argv /** @type {isRoute[]} */ = []
+  handle() {
+    let func /** @type {Koa.Middleware} */ = null
+    let argv /** @type {MatchRoute[]} */ = []
 
     for (const a of arguments) {
-      if (typeof a == 'function') {
-        cb = a
-      }
-      else if (typeof a == 'string') {
-        argv.push(isHttpMethod(a)
-          ? ctx => ctx.method === a.toUpperCase()
-          : ctx => ctx.path === a)
-      }
-      else if (RegExp[ Symbol.hasInstance ](a)) {
-        argv.push(rxparams(a))
-      }
+      if (typeof a == 'function')
+        func = a
+
+      else if (typeof a == 'string')
+        argv.push(pathOrMethod(a))
+
+      else if (RegExp[ Symbol.hasInstance ](a))
+        argv.push(matchParams(a))
     }
 
-    Is.assert.f(cb, 'missing route callback')
+    if (typeof func != 'function')
+      throw new Error('missing route callback')
 
-    this.use(/** @type {Koa.Middleware} */ (ctx, next) =>
+    this.use((ctx, next) =>
       argv.every(fn => fn(ctx))
-        ? cb(ctx, next)
+        ? func(ctx, next)
         : next())
   }
 }
 
 /**
- * @param  {RegExp} rx
- * @return {isRoute}
+ * @param  {string} x
+ * @param  {string} [k='path']
+ * @return {Koa.Middleware}
  */
-export function rxparams(rx) {
-  // rx.global || (rx = new RegExp(rx.source, 'g'))
+function pathOrMethod(x, k = 'path') {
+  return Http.METHODS.includes(x.toUpperCase())
+    ? (x => ctx => ctx.method == x)(x.toUpperCase())
+    : ctx => ctx.path == x
+}
+
+/**
+ * @param  {RegExp} rx
+ * @return {MatchRoute}
+ */
+function matchParams(rx) {
   return ctx => {
     const match = ctx.path.match(rx)
     Object.assign(ctx.params, match?.groups)
     return !!match
   }
 }
-
-/**
- * @param  {string} str
- * @return {isRoute}
- */
-export function rxpath(str) {
-  const rx = new RegExp(str
-      .replace(/:(\w+)/g, `(?<$1>w+)`)
-      .replace(/(?<!\\)\//g, `\\/`)
-      .replace(/(?<!\\)\b[wsdb][+*?]/gi, `\\$&`), 'g')
-  return rxparams(rx)
-}
-
-/**
- * @param  {string} x
- * @return {boolean}
- */
-function isHttpMethod(x) {
-  return Http.METHODS.includes(x.toUpperCase())
-}
-
-/**
- * @callback Route
- * @param  {Koa.Middleware|RegExp|string} url
- * @param  {Koa.Middleware} [cb]
- *//**
- * @callback isRoute
- * @param  {Koa.Context} ctx
- * @return {boolean}
- */
