@@ -15,7 +15,7 @@
     "url" : "git@github.com:4apaev/bikeshop.git"
   },
   "scripts": {
-    "up"     : "c ",
+    "up"     : "docker-compose up -d",
     "down"   : "docker-compose down",
     "migrate": "node db/migrate.js",
     "start"  : "node index.js",
