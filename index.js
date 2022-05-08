@@ -1,4 +1,4 @@
-import { Log } from './util/index.js'
+import Log from './util/log.js'
 import { port } from './config/config.js'
 
 import * as User from './service/user.js'
