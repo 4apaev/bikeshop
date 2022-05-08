@@ -37,10 +37,22 @@ export default class Fail extends Error {
       : { [ k ]: v })
   }
 
+  toString() {
+    return [
+      this.name,
+      this.code ?? 0,
+      this.message,
+      '\n',
+      this.stack ?? '',
+    ].join(' ')
+  }
+
   static as = (m, c) => Reflect.construct(this, [ m, c ])
   static is = x => this[ Symbol.hasInstance ](x)
+  static deny = (m, c, reject) => reject
+    ? reject(this.as(m, c))
+    : Promise.reject(this.as(m, c))
 
-  static deny = (m, c) => Promise.reject(this.as(m, c))
   static assert = (x, m) => x || this.raise(m)
   static raise = (m, c) => {
     throw this.as(m, c)
