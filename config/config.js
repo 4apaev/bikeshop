@@ -1,7 +1,6 @@
 /* eslint-disable key-spacing */
 import Fs from 'fs'
 import Path from 'path'
-import { mergeEnv } from '../util/env.argv.js'
 
 export const cwd = process.cwd()
 export const isContainer = cwd === '/bikeshop'
@@ -67,3 +66,33 @@ function getConfig() {
   }
 }
 
+function mergeEnv(str, u) {
+  let re = {}
+  let prev = u
+
+  for (let next of str.split(/\n+/g)) {
+    if ((next = next.trim()).length === 0)
+      continue
+
+    let [ k, v ] = next.split('=').map(s => s.trim())
+
+    if (v) {
+      prev = u
+      if (k in process.env)
+        console.log('override', k, v)
+
+      re[ k ] = process.env[ k ] = v
+    }
+    else if (prev) {
+      re[ prev ].push(k)
+      process.env[ prev ] = re[ prev ]
+    }
+    else {
+      prev = k
+      if (k in process.env)
+        console.log('override', prev)
+      process.env[ prev ] = re[ prev ] = []
+    }
+  }
+  return re
+}
