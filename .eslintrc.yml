@@ -37,8 +37,8 @@ rules:
     - error
     - args: after-used
       caughtErrors: none
-      argsIgnorePattern: ^_|Koa
-      varsIgnorePattern: ^_|Koa
+      argsIgnorePattern: ^_
+      varsIgnorePattern: ^_
 
   no-useless-computed-key:
     - error
@@ -58,7 +58,7 @@ rules:
 
   multiline-ternary:
     - error
-    # - always-multiline
+    - always-multiline
 
   eol-last:
     - error
