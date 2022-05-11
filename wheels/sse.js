@@ -8,7 +8,6 @@ import {
   Transform,
 } from 'stream'
 
-import Is from '../util/is.js'
 import { period } from '../util/date.js'
 
 const DELAY = 3000
@@ -87,7 +86,7 @@ function transform(chunk, enc, cb) {
  * @return {string}
  */
 export function format(msg) {
-  const re = Is.s(msg)
+  const re = typeof msg == 'string'
     ? frmt('data: %s\n', msg)
     : Object.keys(msg).reduce((re, k) => re + frmt('%s: %j\n', k, msg[ k ]), '')
   return re + '\n\n'

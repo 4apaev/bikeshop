@@ -1,5 +1,5 @@
 // @ts-check
-import Crypt from 'crypto'
+import { createHmac } from 'crypto'
 
 import {
   BIKESHOP_SECRET as SECRET,
@@ -79,7 +79,7 @@ export function verify(s) {
  * @return {string}
  */
 export function sign(...a) {
-  return Crypt.createHmac('SHA256', SECRET)
+  return createHmac('SHA256', SECRET)
       .update(a.join(LNK))
       .digest('base64')
 }

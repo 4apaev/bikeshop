@@ -1,5 +1,5 @@
 // @ts-check
-import crypto from 'crypto'
+import { randomUUID } from 'crypto'
 import * as Mim from '../util/mim.js'
 import Log from '../util/log.js'
 
@@ -20,7 +20,7 @@ export const methods = new Set([
 export async function logger(ctx, next) {
   const start = Date.now()
   ctx.params = {}
-  ctx.id = crypto.randomUUID()
+  ctx.id = randomUUID()
 
   await next()
   debug('%s %d %s %s %s',

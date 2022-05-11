@@ -1,7 +1,10 @@
 // @ts-check
-import Fs from 'fs'
-import Path from 'path'
 import Styl from 'stylus'
+import { join } from 'path'
+import {
+  readFile,
+  createReadStream,
+} from 'fs'
 
 import {
   stat as Stats,
@@ -24,7 +27,7 @@ export function statiq(base, dict) {
   dict ??= { '/': '/index.html' }
   return ctx => {
     let path = sanitizePath(ctx.path)
-    return sendFile(ctx, Path.join(base, dict[ path ] ?? path))
+    return sendFile(ctx, join(base, dict[ path ] ?? path))
   }
 }
 
@@ -55,7 +58,7 @@ export async function sendFile(ctx, file) {
     }
     else {
       ctx.type = Mim.fromFile(file, 'txt')
-      ctx.body = Fs.createReadStream(file)
+      ctx.body = createReadStream(file)
       ctx.length = stat.size
     }
     ctx.lastModified = stat.mtime
@@ -70,7 +73,7 @@ export async function sendFile(ctx, file) {
 
 /**
  * @param  {Context} ctx
- * @param  {Fs.Stats} stat
+ * @param  {import('fs').Stats} stat
  * @return {boolean}
  */
 function ETag(ctx, stat) {
@@ -90,7 +93,7 @@ function ETag(ctx, stat) {
  * @param {URLSearchParams} opts
  */
 export default function compile(filename, fn, opts) {
-  return Fs.readFile(filename, 'utf-8', (e, css) => e
+  return readFile(filename, 'utf-8', (e, css) => e
     ? fn(e)
     : Styl(css, {
       filename,
