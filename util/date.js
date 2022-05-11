@@ -8,18 +8,17 @@ export const Units = [
 ]
 
 export const DTF = new Intl.DateTimeFormat([], {
-  year: 'numeric',
+  // year: 'numeric',
+  // weekday: 'short',
   month: 'short',
-  weekday: 'short',
 
   day: 'numeric',
   hour: '2-digit',
   minute: '2-digit',
   second: '2-digit',
-
   hourCycle: 'h23',
-  dayPeriod: 'long',
-  era: 'long',
+  // dayPeriod: 'long',
+  // era: 'long',
 })
 
 export function date(d) {
