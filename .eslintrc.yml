@@ -4,6 +4,12 @@ env:
   es2021: true
   browser: true
 
+globals:
+  isNan: true
+  isFinite: true
+  toString: true
+  hasOwnProperty: true
+
 ignorePatterns:
   - '**/*.ts'
   - '**/*.css'
