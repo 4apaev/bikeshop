@@ -7,4 +7,5 @@ _
 data/db
 types
 node_modules
+*.log
 
