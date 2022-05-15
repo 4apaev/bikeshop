@@ -1,7 +1,7 @@
 // @ts-check
 
 // @ts-ignore
-import is from '/util/is.js'
+import Is from '/util/is.js'
 // @ts-ignore
 import * as Mim from '/util/mim.js'
 
@@ -63,7 +63,7 @@ export default class Sync {
    * @returns {Sync}
    */
   set(key, val) {
-    if (is.o(key)) {
+    if (Is.o(key)) {
       for (let [ k, v ] of Object.entries(key))
         this.head.set(k, v)
     }
@@ -105,13 +105,13 @@ export default class Sync {
     if (body == null)
       return this
 
-    if (is(HTMLFormElement, body))
+    if (Is(HTMLFormElement, body)) // @ts-ignore
       body = Object.fromEntries(new FormData(body))
 
-    else if (is(FormData, body))
+    else if (Is(FormData, body))
       body = Object.fromEntries(body)
 
-    if (is.o(body)) {
+    if (Is.o(body)) {
       this.type() ?? this.type(Mim.json)
       this.body = JSON.stringify(body)
     }
@@ -131,7 +131,7 @@ export default class Sync {
     if (!key)
       return this
 
-    if (is.o(key)) {
+    if (Is.o(key)) {
       for (const [ k, v ] of Object.entries(key))
         this.url.searchParams.set(k, v)
     }

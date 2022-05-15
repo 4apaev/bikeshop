@@ -6,11 +6,10 @@ import _Form from '/js/comp/form.js'
 const µ = undefined
 
 export default class Table extends Base {
-  #req
   #form
   #dialog
 
-  css = `@import url('/css/table.css?uid=${ this.uid }')`
+  css = `@import url('/css/table.styl?uid=${ this.uid }')`
 
   cells = []
   fields = []
@@ -55,8 +54,26 @@ export default class Table extends Base {
     this.on('click', 'button.close', (e, stop) => (this.dialog.close(), stop))
 
     this.apiurl ??= this.get('apiurl')
-    Sync.get(this.apiurl, { limit: 10 })
-        .then(this.render, Log.error)
+    this.form
+        .on('error', e => {
+          Log.error('POST:error', e.detail)
+          this.fetch()
+        })
+        .on('before:send', e => Log('before:send', e))
+        .on('after:send', e => {
+          Log('after:send', e)
+          this.fetch()
+        })
+
+    this.fetch()
+  }
+
+  fetch(done, fail) {
+    return Sync.get(this.apiurl, { limit: 10 })
+        .then(
+          done ?? this.render,
+          fail ?? Log.error,
+        )
   }
 
   toggleDialog = (e, stop) => {
@@ -69,7 +86,7 @@ export default class Table extends Base {
 
   render = ({ body }) => {
     const { frag } = $
-    const form = this.$('ws-form')
+    const { form } = this
 
     for (const row of body?.value ?? body) {
       const tr = $.tr()

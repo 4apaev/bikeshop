@@ -8,17 +8,20 @@
   <title>BikeShop</title>
 
   <link rel=icon href="/img/favicon.svg"/>
-  <link rel=stylesheet type="text/css" href="/css/main.css">
+  <link rel=stylesheet type="text/css" href="/css/main.styl">
 
   <script type="module">
     import O    from '/util/define.js'
     import Is   from '/util/is.js'
     import $    from '/js/dom.js'
-    import sse  from '/js/sse.js'
     import Sync from '/js/sync.js'
 
     const Log = O(console.log, console)
-    O.mix(window, { O, $, Is, Sync, Log, log: Log, sse })
+
+    const sse = window.sse = new EventSource(location.origin + '/api/stream')
+    sse.onmessage = e => Log('📡 📥 SSE', e.type ?? '-', e.data)
+    sse.onerror = e => Log('📡 🚧 SSE', e.readyState == EventSource.CLOSED ? 'CLOSED' : 'ERROR', e)
+    O.mix(window, { O, $, Is, Sync, Log, log: Log  })
   </script>
 </head>
 

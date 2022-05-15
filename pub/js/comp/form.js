@@ -4,7 +4,6 @@ import Base from './base.js'
 import O from '../../../util/define.js'
 
 export default class Form extends Base {
-  #req
   #form
   #container
 
@@ -83,9 +82,13 @@ export default class Form extends Base {
     this.$('.send').set('disabled', true)
 
     try {
-      await this.send(this.form)
+      const body = O.from(new FormData(this.form))
+      this.emit('before:send', body)
+      const re = await this.send(body)
+      this.emit('after:send', re)
     }
     catch (err) {
+      this.emit('error', err)
       this.show(err?.message ?? err?.body?.message ?? 'Error', 1)
     }
     finally {
