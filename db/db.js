@@ -11,14 +11,9 @@ pool.on('connect', () => debug('[pool] connected'))
 pool.on('remove', () => debug('[pool] client removed'))
 pool.on('error', e => debug(`[pool:error]`, e))
 
-/**
- * @param  {string | pg.QueryArrayConfig<*>} sql
- * @param  {*[]} [params]
- * @return {Promise<QRes>}
- */
-export async function _query(sql, params) {
+/** @type {Query} */
+export default async function query(sql, params = []) {
   let error, result
-
   try {
     result = await pool.query(sql, params)
     return {
@@ -29,7 +24,7 @@ export async function _query(sql, params) {
   }
 
   catch (e) {
-    Log.error('[db:error]', e)
+    Log.error('[db:error]', e.message)
     return {
       error: e,
       result,
@@ -38,42 +33,18 @@ export async function _query(sql, params) {
   }
 }
 
-export default async function query(sql, params) {
-
-  return new Promise((done, fail) => {
-    pool.query(sql, params, (error, result) => {
-      if (error) {
-        Log.error('[db:error]', error)
-        fail({
-          error,
-          result,
-          value: [],
-        })
-      }
-      else {
-        done({
-          error,
-          result,
-          value: result?.rows ?? [],
-        })
-      }
-    })
-  })
-
-}
-
 /**
  * @param  {TemplateStringsArray} s
  * @param  {*[]} a
  */
 export function tmpl(s, ...a) {
-  return query(String.raw(s, ...a))
+  return query(String.raw(s, ...a), [])
 }
 
 /**
  * @param  {string} table
  * @param  {string[]} keys
- * @return {QWhere}
+ * @return {Where}
  */
 export function where(table, ...keys) {
   const head = `select "${ keys.join('", "') }" from ${ table }`
@@ -98,14 +69,13 @@ export function where(table, ...keys) {
 }
 
 /**
- * @callback QWhere
- * @param {Object<string, *>} props
- * @param {number} [limit=10]            *//**
-
  * @typedef {Object} QRes
- * @prop {pg.DatabaseError | Error } [error]
- * @prop {pg.QueryResult} result
- * @prop {?} value                        *//**
-
- * @typedef { string | TemplateStringsArray | pg.QueryArrayConfig<*> } SqlStr
+ * @prop {import('pg').DatabaseError|Error} [error]
+ * @prop {import('pg').QueryResult} result
+ * @prop {?} value
  */
+
+/** @typedef {string|import('pg').QueryArrayConfig} QString */
+/** @typedef {(props: Object<string, *>, limit?: number) => Promise<QRes>} Where */
+/** @typedef {(sql: QString, params?: *[]) => Promise<QRes>} Query */
+

@@ -1,65 +1,28 @@
 {
   "compilerOptions": {
-
-
-
-    "lib"                  : [ "ES2018" ],  /* Specify library files to be included in the compilation. */
-    "target"               : "ES2021",
-    "module"               : "ESNext",
-
-    "baseUrl"              : "./",    /* Base directory to resolve non-absolute module names. */
-    "outDir"               : "types", /* this is overritten by `npm run types` */
-    "moduleResolution"     : "node",
-    "removeComments"       : true,
-    "pretty"               : true,
-    "allowJs"              : true,
-    "checkJs"              : true,
-    "declaration"          : true,  /* .d.ts file. */
-    "declarationMap"       : true,  /* sourcemap for .d.ts files */
-    "emitDeclarationOnly"  : true,
-    "allowSyntheticDefaultImports" : true,
-    // "strict"            : true,
-    // "noImplicitAny"     : true,
+    "moduleResolution": "node",
+    "module": "ES6",
+    "target": "esnext",
+    "outDir": "./types",
+    "pretty": true,
+    "allowJs": true,
+    "removeComments": true,
+    "emitDeclarationOnly": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "declaration": true,
   },
-
   "include": [
+    "index.js",
     "db/**/*",
     "util/**/*",
     "config/**/*",
     "wheels/**/*",
     "service/**/*",
-  ] ,
-
+  ],
   "exclude": [
     "_/**/*",
     "pub/**/*",
-    //
+    "types/**/*",
   ],
-
-  // "include": ["./*.js"],
-  // "exclude": ["./dist"]
 }
-
-
-
-
-
-
-
-// {
-
-//   "compilerOptions": {
-    // "allowJs"                     : true,
-    // "allowSyntheticDefaultImports": true,
-    // "emitDeclarationOnly"         : true,
-    // "declaration"                 : true,
-    // "pretty"                      : true,
-    // "removeComments"              : true,
-
-    // "target"           : "ES2021",
-    // "module"           : "ESNext",
-    // "outDir"           : "types",
-    // "moduleResolution" : "Node",
-
-//   }
-// }

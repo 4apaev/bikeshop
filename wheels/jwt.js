@@ -48,6 +48,7 @@ export /* atob */ function decode(s, e) {
   }
   catch (_) {
     debug('[decode:Invalid JSON]', _)
+    return false
   }
 }
 
