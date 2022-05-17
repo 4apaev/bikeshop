@@ -1,7 +1,7 @@
 // @ts-check
 import * as Bike from '../db/bikes.js'
 import Is from '../util/is.js'
-import request, { assert } from './db.request.js'
+import request from './db.request.js'
 
 const Kind = new Set([
   'city',
@@ -15,16 +15,14 @@ const Kind = new Set([
 
 /** @type {Mware} */
 export const get = request('Bikes.Get', ctx => {
-  let id = +ctx?.params?.id
-  assert(Is.n(id = +id), 400, 'invalid bike id')
+  let id = ctx?.params?.id
+  Is.n(id = +id) || ctx.throw(400, 'invalid bike id')
   return Bike.get({ id })
 })
 
 /** @type {Mware} */
-export const list = request('Bikes.List', ctx => {
-  const q = Object.fromEntries(ctx.URL?.searchParams ?? [[ 'limit', 10 ]])
-  return Bike.list(q)
-})
+export const list = request('Bikes.List', ctx =>
+  Bike.list({ limit: 10, ...ctx.query }))
 
 /** @type {Mware} */
 export const create = request('Bikes.Create', ctx => {
@@ -33,8 +31,8 @@ export const create = request('Bikes.Create', ctx => {
     kind = 'city', // @ts-ignore
   } = ctx?.request?.body ?? {}
 
-  assert(Is.s(desc), 400, 'invalid bike desc')
-  assert(Kind.has(kind), 400, 'invalid bike kind')
+  Is.s(desc) || ctx.throw(400, 'invalid bike desc')
+  Kind.has(kind) || ctx.throw(400, 'invalid bike kind')
 
   return Bike.create({ kind, desc })
 })

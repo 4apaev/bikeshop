@@ -2,32 +2,30 @@
 import Is from '../util/is.js'
 import * as User from '../db/users.js'
 import { create as createToken } from '../wheels/jwt.js'
-import request, { assert } from './db.request.js'
+import request from './db.request.js'
 
 /** @type {Mware} */
 export const get = request('Users.Get', ctx => {
-  let id = +ctx?.params?.id
-  assert(Is.n(id = +id), 400, 'invalid user id')
+  let id = ctx?.params?.id
+  Is.n(id = +id) || ctx.throw(400, 'invalid user id')
   return User.get({ id })
 })
 
 /** @type {Mware} */
-export const list = request('Users.List', ctx => {
-  const q = Object.fromEntries(ctx.URL?.searchParams ?? [[ 'limit', 10 ]])
-  return User.list(q)
-})
+export const list = request('Users.List', ctx =>
+  User.list({ limit: 10, ...ctx.query }))
 
 /** @type {Mware} */
 export const create = request('Users.Create', ctx => {
   let {
     name,
     mail,
-    pass,
-  } = ctx?.payload ?? {}
+    pass, // @ts-ignore
+  } = ctx?.request?.body ?? {}
 
-  assert(Is.s(name), 400, 'invalid user name')
-  assert(Is.s(mail), 400, 'invalid user mail')
-  assert(Is.s(pass), 400, 'invalid user pass')
+  Is.s(name) || ctx.throw(400, 'invalid user name')
+  Is.s(mail) || ctx.throw(400, 'invalid user mail')
+  Is.s(pass) || ctx.throw(400, 'invalid user pass')
 
   return User.create({ name, mail, pass })
 })
@@ -36,18 +34,17 @@ export const create = request('Users.Create', ctx => {
 export const auth = request('Users.auth', async ctx => {
   let {
     mail,
-    pass,
-  } = ctx?.payload ?? {}
+    pass, // @ts-ignore
+  } = ctx?.request?.body ?? {}
 
-  assert(Is.s(mail), 400, 'invalid user name')
-  assert(Is.s(pass), 400, 'invalid user pass')
+  Is.s(mail) || ctx.throw(400, 'invalid user mail')
+  Is.s(pass) || ctx.throw(400, 'invalid user pass')
 
   const { error, value } = await User.auth({ mail, pass })
   if (error)
     return { error, value }
 
-  const id = value?.[ 0 ]?.id
-  assert(id, 401, 'invalid user credentials')
+  const id = value?.[ 0 ]?.id ?? ctx.throw(400, 'invalid user credentials')
 
   const token = createToken({
     id,
