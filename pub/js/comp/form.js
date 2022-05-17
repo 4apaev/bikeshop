@@ -70,10 +70,7 @@ export default class Form extends Base {
   show(msg, err) {
     const bq = this.$('blockquote')
     bq.text = msg ?? ''
-    if (err)
-      bq.cls.add('err')
-    else
-      bq.cls.remove('err')
+    bq.classList.toggle('err', !!err)
   }
 
   submit = async e => {

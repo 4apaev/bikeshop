@@ -1,13 +1,18 @@
-import O from '/util/define.js'
-import is from '/util/is.js'
+import Is from '/util/is.js'
+import use, {
+  assign,
+  alias,
+  each,
+} from '/util/define.js'
 
 const µ = null
 const A = Array
-const E = new WeakMap
-const STOP = Symbol('📛')
+const O = Object
+const S = String
+const EVT = new WeakMap
 const doc = document
 
-is.use('node', x => Node[ Symbol.hasInstance ](x))
+Is.use('node', x => Node[ Symbol.hasInstance ](x))
 
 export function camel2snake(s) {
   return s.replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -15,50 +20,33 @@ export function camel2snake(s) {
 }
 
 export default function JQ(q, el = doc, cb) {
-  if (is.f(el))
-    cb = el, el = doc
-  return /^\++/.test(q) || is.f(cb)
-    ? A.from(el.querySelectorAll(q.replace(/^\++/, '')), cb)
+  Is(Node, el) || (cb = el, el = doc)
+  return cb ?? /^\++/.test(q)
+    ? A.from(el.querySelectorAll(q.replace(/^\++/, '')), Is.s(cb)
+      ? x => x[ cb ] ?? x
+      : cb)
     : el.querySelector(q)
 }
 
-O.use(JQ, {
+use(JQ, {
+  get EVT() {
+    return EVT
+  },
   get frag() {
     return doc.createDocumentFragment()
   },
-
-  stop(e) {
-    e.stopImmediatePropagation()
-    e.stopPropagation()
-    e.preventDefault()
-  },
-
-  getEvents(x) {
-    return E.get(x)
-  },
-
-  text() {
+  text()     {
     return doc.createTextNode.apply(doc, arguments)
   },
-  attr() {
-    return doc.createAttribute.apply(doc, arguments)
+  stop(e)    {
+    return e.preventDefault(e.stopPropagation(e.stopImmediatePropagation()))
   },
-  comment() {
-    return doc.createComment.apply(doc, arguments)
-  },
-
-  create(name, props, ...children) {
-    const el = doc.createElement(name)
-    if (props) {
-      if (is.O(props))
-        el.attr(props)
-      else
-        el.append(props)
-    }
-    el.append(...children)
+  create(tag, o, ...ch) {
+    const el = doc.createElement(tag)
+    o != µ && (o?.constructor === O ? el.attr(o) : el.append(o))
+    el.append(...ch)
     return el
   },
-
   ico(id, width = 64, heigth = width) {
     JQ.svg({ width, heigth },
       JQ.create('use', {
@@ -68,41 +56,29 @@ O.use(JQ, {
   },
 })
 
-O.alias(Node.prototype, 'textContent', 'text')
-O.alias(Node.prototype, 'parentElement', 'parent')
+alias(Node.prototype, 'textContent', 'text')
+alias(Node.prototype, 'parentElement', 'parent')
+alias(Element.prototype, 'classList', 'cls', 'clas', 'clss')
+alias(Element.prototype, 'hasAttribute', 'has')
+alias(Element.prototype, 'toggleAttribute', 'toggle')
+alias(Element.prototype, 'querySelector', 'find')
+alias(Element.prototype, 'lastElementChild', 'last')
+alias(Element.prototype, 'firstElementChild', 'first')
+alias(Element.prototype, 'nextElementSibling', 'next')
+alias(Element.prototype, 'previousElementSibling', 'prev')
 
-O.alias(Element.prototype, 'classList', 'cls')
-O.alias(Element.prototype, 'hasAttribute', 'has')
-O.alias(Element.prototype, 'toggleAttribute', 'toggle')
-O.alias(Element.prototype, 'querySelector', 'find')
-O.alias(Element.prototype, 'lastElementChild', 'last')
-O.alias(Element.prototype, 'firstElementChild', 'first')
-O.alias(Element.prototype, 'nextElementSibling', 'next')
-O.alias(Element.prototype, 'previousElementSibling', 'prev')
-
-O.use(Element.prototype, {
+use(Element.prototype, {
   $(s, cb) {
     return JQ(s, this, cb)
   },
-
-  html(s, ...a) {
-    if (s == µ)
-      return this.innerHTML
-
-    if (a.length) { // eslint-disable-next-line no-var
-      for (var i = 0, re = [ s.raw[ 0 ] ]; i < a.length;)
-        re = re.concat(a[ i++ ], s.raw[ i ])
-      s = re.join('')
-    }
-    return this.empty().insert(s.trim())
+  html(s) {
+    return s == µ
+      ? this.innerHTML
+      : this.empty().insert(s?.raw ? S.raw.apply(S, arguments) : s)
   },
-
-  empty(cb = x => x) {
-    while (this.first)
-      this.removeChild(cb(this.first.off()))
-
+  empty() {
     while (this.firstChild)
-      this.removeChild(this.firstChild)
+      this.removeChild(this.firstChild?.off?.() ?? this.firstChild)
     return this
   },
 
@@ -115,17 +91,16 @@ O.use(Element.prototype, {
 
   get(k) {
     const v = this.getAttribute(k)
-    return v === ''
-      ? true
-      : v
+    return v === '' ? true : v
   },
 
   set(k, v) {
-    if (is.b(v ??= false))
-      return this.toggleAttribute(k, v)
-
-    if (is.o(v))
-      O.each((v, k) => this.dataset[ k ] = v)
+    if (v == µ || Is(Boolean, v))
+      return this.toggle(k, !!v)
+    if (k == 'cls' || k == 'clss' || k.startsWith('clas'))
+      A.isArray(v) || Is(S, v) ? this.clas.add(...[ v ].concat(v)) : each.kv(v, this.clas.toggle, this.clas)
+    else if (Is.o(v))
+      Is.o(this[ k ]) ? assign(this[ k ], v) : this[ k ] = v
     else
       this.setAttribute(k, v)
     return this
@@ -133,29 +108,22 @@ O.use(Element.prototype, {
 
   attr(k, v) {
     const i = arguments.length
-    if (i === 0) {
-      return O.from(A.from(this.attributes, a => [ a.name, a.value === ''
-        ? true
-        : a.value ]))
-    }
-
-    if (i === 1) {
-      if (is.o(k)) {
-        for (const [ a, b ] of O.entries(k))
-          this.set(a, b)
-        return this
-      }
-      return this.getAttribute(k)
-    }
-    return this.set(k, v)
+    return i === 0
+      ? use.from(A.from(this.attributes, a => [ a.name,  this.get(a.name) ]))
+      : i === 1
+        ? Is.o(k)
+          ? each.kv(k, this.set, this)
+          : this.get(k)
+        : this.set(k, v)
   },
 
   on(ch, query, cb) {
-    is.f(query) && ([ query, cb ] = [ cb, query  ])
+    Is.f(query) && ([ query, cb ] = [ cb, query  ])
 
     const listener = query
-      ? e => e.target.matches(query) && STOP === cb(e, STOP) && JQ.stop(e)
-      : e => STOP === cb(e, STOP) && JQ.stop(e)
+      ? e => e.target.matches(query)
+          && cb(e, e.target)
+      : e => cb(e, e.target)
 
     const off = (a, b) => {
       if ((!a || a === ch) && (!b || b === cb)) {
@@ -165,35 +133,35 @@ O.use(Element.prototype, {
       return false
     }
 
-    E.get(this)?.push?.(off) ?? E.set(this, [ off ])
+    EVT.get(this)?.push?.(off) ?? EVT.set(this, [ off ])
     this.addEventListener(ch, listener)
     return this
   },
 
   off(e, cb) {
-    const it = E.get(this)
+    const it = EVT.get(this)
     if (it == µ) return this
+
+    Is.f(e) && (cb = e, e = µ)
+
     let j = 0
+    for (let i = 0; i < it.length; i++)
+      it[ i ](e, cb) || (it[ j++ ] = it[ i ])
 
-    if (is.f(e))
-      cb = e, e = null
-
-    for (let i = 0; i < it.length; i++) {
-      if (!it[ i ](e, cb))
-        it[ j++ ] = it[ i ]
-    }
     it.length = j
-    j === 0 && E.delete(this)
+    j === 0 && EVT.delete(this)
     return this
   },
 
-  emit(e, detail = {}) {
-    const ce = new CustomEvent(e, {
+  emit(e, detail = O.o) {
+    this.dispatchEvent(use(new CustomEvent(e, {
       detail,
       bubbles: true,
       cancelable: true,
-    })
-    this.dispatchEvent(ce)
+    }), 0, 0, 0, {
+      target: this,
+      currentTarget: this,
+    }))
     return this
   },
 })

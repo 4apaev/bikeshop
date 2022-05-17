@@ -1,35 +1,30 @@
 // import O    from '/util/define.js'
 // import Is   from '/util/is.js'
-// import $    from '/js/dom.js'
+import $ from '/js/dom.js'
 // import Sync from '/js/sync.js'
 
-const sse = new EventSource(location.origin + '/api/stream')
-export default sse
-
-const log = (s, ...a) => console.log('[SSE:%s]', s, ...a)
-
-sse.onmessage = e => {
-  log(e.type ?? '-', e.data)
+const log = s => e => {
+  console.group('[📡:%s]', s)
+  console.log(e)
+  console.log(e.type)
+  console.log(e.data)
+  console.groupEnd()
 }
 
-sse.addEventListener('message', e => {
-  log(`#${ e.type ?? '-' }`, e.data)
-})
+export default function SSE(path) {
+  path ??= $('meta[name="sse-path"]').get('content')
+  const sse = SSE.sse = new EventSource(new URL(path, location.origin))
 
-sse.addEventListener('open', e => {
-  log('OPEN', e)
-})
+  const open = log('📭 Open')
+  sse.addEventListener('open', e => {
+    open(e)
 
-sse.addEventListener('ping', e => {
-  log('PING', e.data)
-})
+  }, false)
+  sse.addEventListener('error', log('📛🎙 Error'), false)
 
-sse.addEventListener('change', e => {
-  log('CHANGE', e.data)
-})
+  sse.addEventListener('message', log('🎙 Message'), false)
+  sse.addEventListener('ping', log('🏓 Ping'), false)
+  sse.addEventListener('change', log('👛 Change'), false)
+  return sse
+}
 
-sse.addEventListener('error', e => {
-  log(e.readyState == EventSource.CLOSED
-    ? 'CLOSED'
-    : 'ERROR', e)
-})
