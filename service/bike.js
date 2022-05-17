@@ -30,8 +30,8 @@ export const list = request('Bikes.List', ctx => {
 export const create = request('Bikes.Create', ctx => {
   let {
     desc = '',
-    kind = 'city',
-  } = ctx?.payload ?? {}
+    kind = 'city', // @ts-ignore
+  } = ctx?.request?.body ?? {}
 
   assert(Is.s(desc), 400, 'invalid bike desc')
   assert(Kind.has(kind), 400, 'invalid bike kind')

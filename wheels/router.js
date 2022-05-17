@@ -2,10 +2,16 @@
 import Koa from 'koa'
 import Http from 'http'
 
-/** @typedef {(ctx: Koa.Context) => boolean } MatchRoute */
-/** @typedef {(url: Koa.Middleware|RegExp|string, cb: import('./middleware.js').Mware) => void } Route */
+/** @typedef {Koa.Context} Context */
+/** @typedef {Koa.Middleware} Middleware */
+/** @typedef {Middleware | RegExp | string} AUse */
+/** @typedef {(ctx: Context) => boolean } MatchRoute */
+/** @typedef {(url: AUse, cb: Middleware) => void } Route */
 
-/** @implements {Koa} */
+/**
+ * @extends {Koa}
+ * @implements {Koa}
+ */
 export default class Router extends Koa {                               // eslint-disable-next-line brace-style
   /** @type {Route} */ get(url, cb)  { this.handle('GET', url, cb) }    // eslint-disable-next-line brace-style
   /** @type {Route} */ del(url, cb)  { this.handle('DELETE', url, cb) } // eslint-disable-next-line brace-style
@@ -13,7 +19,7 @@ export default class Router extends Koa {                               // eslin
   /** @type {Route} */ post(url, cb) { this.handle('POST', url, cb) }
 
   handle() {
-    let func /** @type {Koa.Middleware} */ = null
+    let func /** @type {Middleware} */ = null
     let argv /** @type {MatchRoute[]} */ = []
 
     for (const a of arguments) {
@@ -39,10 +45,9 @@ export default class Router extends Koa {                               // eslin
 
 /**
  * @param  {string} x
- * @param  {string} [k='path']
- * @return {Koa.Middleware}
+ * @return {Middleware}
  */
-function pathOrMethod(x, k = 'path') {
+function pathOrMethod(x) {
   return Http.METHODS.includes(x.toUpperCase())
     ? (x => ctx => ctx.method == x)(x.toUpperCase())
     : ctx => ctx.path == x

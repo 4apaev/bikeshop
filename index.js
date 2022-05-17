@@ -1,5 +1,5 @@
 import Log from './util/log.js'
-import { port } from './config/config.js'
+import * as Config from './config/config.js'
 
 import * as User from './service/user.js'
 import * as Bike from './service/bike.js'
@@ -10,36 +10,19 @@ import Router from './wheels/router.js'
 import {
   echo,
   logger,
+  onError,
   reqPayload,
 } from './wheels/middleware.js'
 
-// import {
-//   send,
-//   statiq,
-// } from './wheels/middleware.static.js'
+import {
+  send,
+  statiq,
+} from './wheels/middleware.static.js'
 
 const debug = Log.debug('app')
 const app = new Router
 
-/**
- * @param {number} c
- * @param {string | Error} e
- */
-function deny(c, e) {
-  this.status = c
-  this.type = 'json'
-  this.body = {
-    error: true,
-    message: String(e),
-  }
-  debug('Deny', e?.message)
-}
-app.context.deny = deny
-
-app.on('error', (e, ctx) => {
-  Log.error('{{{{{{ error }}}}}}', e)
-  Log.error('{{{{{{ error }}}}}}', ctx)
-})
+app.on('error', onError)
 
 // //////////////////////////////////////////////////
 app.use(logger)
@@ -66,17 +49,18 @@ app.post('/api/auth/login', User.auth)
 app.get('/healtcheck', echo)
 
 // ////////////////////////////////////////////////// static
-const cwd = process.cwd()
 
-// app.get(/^\/app\/.*/,    send(cwd + '/pub/index.html'))
-// app.get(/^\/util\/.*/, statiq(cwd))
-// app.get(statiq(cwd + '/pub', { '/': '/index.html' }))
+app.context.Config = Config
 
-const server = app.listen(port, () => {
-  Log`
-  Server started on port ${ port }
-  CWD ${ cwd }
-  `
+app.get(/^.app\/.*/,  send(Config.statiq.index))
+app.get(/^.util\/.*/, statiq(Config.cwd))
+app.get(statiq(Config.statiq.dir, Config.statiq.dict))
+
+const server = app.listen(Config.port, () => {
+  debug(`
+  Server started on port %s
+  CWD %s
+  `, Config.port, Config.cwd)
 })
 
 export { app, server }

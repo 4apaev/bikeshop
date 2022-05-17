@@ -1,13 +1,11 @@
 // @ts-check
-import { randomUUID } from 'crypto'
-import * as Mim from '../util/mim.js'
 import Log from '../util/log.js'
-
 import * as format from '../util/date.js'
-
 const debug = Log.debug('middleware')
 
-/** @typedef {import("koa").Middleware} Mware */
+/** @typedef {import("koa").Context} Context */
+/** @typedef {import("http-errors").HttpError} HttpError */
+/** @typedef {import("koa").Middleware} Middleware */
 
 export const methods = new Set([
   'POST',
@@ -16,63 +14,71 @@ export const methods = new Set([
   'DELETE',
 ])
 
-/** @type {Mware} */
+/** @type {Middleware} */
 export async function logger(ctx, next) {
-  const start = Date.now()
+  const start = format.now()
   ctx.params = {}
-  ctx.id = randomUUID()
 
-  await next()
-  debug('%s %d %s %s %s',
-    format.date(start),
-    ctx.status,
-    ctx.method,
-    ctx.path,
-    Date.now() - start)
+  try {
+    await next()
+    debug(
+      '%s %d %s %s %dms',
+      format.date(),
+      ctx.status,
+      ctx.method,
+      ctx.path, // @ts-ignore
+      format.now(start))
+  }
+  catch (e) {
+    ctx.status = e.status ?? e.code ?? 500
+    ctx.type = 'json'
+    ctx.body = {
+      error: true,
+      message: e.message,
+    }
+    ctx.app.emit('error', e, ctx)
+  }
 }
 
-/** @type {Mware} */
+/** @type {Middleware} */
 export function echo(ctx) {
   ctx.status = 200
   debug('HEALTCHECK', ctx.body = format.uptime().join())
 }
 
-/** @type {Mware} */
+/** @type {Middleware} */
 export async function reqPayload(ctx, next) {
-  if (!methods.has(ctx.method))
-    return next()
+  if (methods.has(ctx.method)) {
+    let body = []
 
-  const payload = []
+    for await (const chunk of ctx.req)
+      body.push(chunk)
 
-  for await (const chunk of ctx.req)
-    payload.push(chunk)
+    // @ts-ignore
+    ctx.request.body = body = Buffer.concat(body).toString()
 
-  ctx.payload = Buffer.concat(payload).toString()
-  return parsePayload(ctx, next)
-}
-
-/** @type {Mware} */
-function parsePayload(ctx, next) {
-  if (!ctx.is(Mim.json))
-    return next()
-
-  if (ctx.payload.length < 2) {
-    ctx.payload = {}
-    debug('payload to small %s:', ctx.req.headers[ 'content-length' ])
-    return next()
-  }
-
-  try {
-    ctx.payload = JSON.parse(ctx.payload)
-    next()
-  }
-  catch (e) {
-    debug('[payload]', 'Invalid JSON')
-    ctx.status = 400
-    ctx.body = {
-      error: true,
-      message: 'Invalid JSON',
+    if (ctx.is('json')) {
+      try {
+        // @ts-ignore
+        ctx.request.body = JSON.parse(body)
+        // debug('🧳 after parse')
+      }
+      catch (e) {
+        ctx.throw(400, 'Payload: Invalid JSON')
+      }
     }
   }
+  // debug('🧳 before next')
+  await next()
 }
 
+/**
+ * @param {HttpError} e
+ * @param {Context} ctx
+ */
+export function onError(e, ctx) {
+  const { status, method, path } = ctx
+  const { name, message, code = e.status ?? 0 } = e
+  Log.error('└ 🚨 [ %s: %d ] %s', name, code, message)
+  Log.table({ code, status, method, path, name, message })
+}

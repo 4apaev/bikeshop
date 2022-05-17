@@ -5,6 +5,15 @@ import Path from 'path'
 export const cwd = process.cwd()
 export const isContainer = cwd === '/backend'
 
+export const statiq = {
+  cwd,
+  dir: cwd + '/pub',
+  index: cwd + '/pub/index.html',
+  dict: {
+    '/': '/index.html',
+  },
+}
+
 export const {
   POSTGRES_DB,
   POSTGRES_USER,
@@ -14,16 +23,7 @@ export const {
   BIKESHOP_SECRET = '',
   BIKESHOP_DEBUG = '*',
   BIKESHOP_PORT = 3000,
-  NODE_ENV = 'dev',
-  // [
-  //   'users',
-  //   'bikes',
-  //   'service',
-  //   'service:users',
-  //   'service:bikes',
-  //   'service:user-bikes',
-  //   'middleware',
-  // ],
+  NODE_ENV = 'development',
 } = getConfig()
 
 export const env    = NODE_ENV
