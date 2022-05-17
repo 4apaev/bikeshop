@@ -1,8 +1,17 @@
-const µ = null
 
 /**
- * @extends {Error}
+ * @typedef {Object<number, string>} NDict *//**
+ * @typedef {string | number | Error} Message *//**
+ * @typedef {(m: Message, c?: any) => Fail } MakeFail */
+
+/**
+ * extends {Error}
  * implements {Error}
+ */
+
+/**
+ * @template T
+ * @extends {Error<T>}
  */
 export default class Fail extends Error {
   /** @type {any}    */ cause
@@ -10,43 +19,45 @@ export default class Fail extends Error {
   /** @type {string} */ message = 'Epic Fail'
   /** @type {string} */ name = 'Fail'
 
-  static /** @type {{ [ k: number]: string }} */ CODES = {}
-  static /** @type {{ [ k: string]: number }} */ STATUSES = {}
+  /** @type {NDict} */
+  static CODES = {}
 
+  /**
+   * @param {Message} e
+   * @param {?} c
+   */
   constructor(e, c) {
     super()
+
     Error.captureStackTrace(this, this.constructor)
     if (Error[ Symbol.hasInstance ](e)) {
       this.message = 'rethrow: ' + e.message
       this.cause = e.cause ?? e
       this.stack += '\n\n' + e.stack
-      this.code ??= this.cause?.code ?? Fail.STATUSES[ e.message ] ?? 0
+      this.code ??= this.cause?.code ?? 0
     }
     else if (e) {
       this.message = e in Fail.CODES
         ? Fail.CODES[ this.code = e ]
         : e
       this.cause = c?.cause ?? c
-      this.code ??= e?.code ?? this?.cause?.code ?? Fail.STATUSES[ e ] ?? 0
+      this.code ??= e?.code ?? this?.cause?.code ?? 0
     }
   }
 
+  get status() {
+    return this.code
+  }
+
   set(k, v) {
-    return Object.assign(this, Object(k) === k
-      ? k
-      : { [ k ]: v })
+    return Object.assign(this, Object(k) === k ? k : { [ k ]: v })
   }
 
   toString() {
-    return [
-      this.name,
-      this.code ?? 0,
-      this.message,
-      '\n',
-      this.stack ?? '',
-    ].join(' ')
+    return `${ this.name } ${ this.code ?? 0 } ${ this.message }\n${ this.stack ?? '' }`
   }
 
+  /** @type {MakeFail} */
   static as = (m, c) => Reflect.construct(this, [ m, c ])
   static is = x => this[ Symbol.hasInstance ](x)
   static deny = (m, c, reject) => reject
@@ -54,37 +65,12 @@ export default class Fail extends Error {
     : Promise.reject(this.as(m, c))
 
   static assert = (x, m) => x || this.raise(m)
+  /**
+   * @param {Message} m
+   * @param {*} c
+   */
   static raise = (m, c) => {
     throw this.as(m, c)
-  }
-
-  static Try(fn, ...a) {
-    try {
-      return [ µ, fn.apply(µ, a) ]
-    }
-    catch (e) {
-      return [ this.as(e?.message ?? 'Try failed', e), µ ]
-    }
-  }
-
-  static trace = start => {
-    const prepare = Error.prepareStackTrace
-    Error.prepareStackTrace = (_, s) => s
-
-    const e = new Error
-    Error.captureStackTrace(e, start ?? this.trace)
-
-    const { stack } = e
-    Error.prepareStackTrace = prepare
-    return stack.map(cs => ({
-      // cs, x,
-      file: cs.getFileName(),
-      name: cs.getFunctionName(),
-      type: cs.getTypeName(),
-      row: cs.getLineNumber(),
-      col: cs.getColumnNumber(),
-
-    }))
   }
 }
 
@@ -129,10 +115,3 @@ Fail.CODES[ 508 ] = 'Loop Detected'
 Fail.CODES[ 509 ] = 'Bandwidth Limit Exceeded'
 Fail.CODES[ 510 ] = 'Not Extended'
 Fail.CODES[ 511 ] = 'Network Authentication Required'
-
-Object.assign(Fail.STATUSES,
-  Object.fromEntries(
-    Object.entries(Fail.CODES)
-        .map(([ k, v ]) =>
-          [ v, k ])))
-

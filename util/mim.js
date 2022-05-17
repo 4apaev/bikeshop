@@ -1,36 +1,49 @@
+// @ts-check
+
+/** @typedef {Object<string, string>} SDict */
+
 export const CT = 'content-type'
 export const CL = 'content-length'
-export const mime = init()
+export const mime /** @type {SDict} */ = {}
 
 /**
- * @callback stringer
- * @param  { string | URL } file
- * @param  {?string } [fallback]
- * @return { string }
+ * @param  {string} x
+ * @param  {any} [fallback]
+ * @return {string}
  */
-
 export function get(x, fallback = x) {
   return mime[ x ] ?? fallback
 }
 
+/**
+ * @param {string} expected
+ * @param {string | Headers | SDict} actual
+ * @return {boolean}
+ */
 export function is(expected, actual) {
   if (typeof actual != 'string')
-    actual = fromHead(actual, false)
-
+    actual = fromHead(actual, '')
   expected = get(expected, expected)
   return actual
     ? actual.includes(expected)
     : actual == expected
 }
 
+/**
+ * @param {Headers | SDict} x
+ * @param {string} [fallback='']
+ * @return {string}
+ */
 export function fromHead(x, fallback = '') {
-  return x?.get?.(CT)
-      ?? x?.[ CT ] ?? fallback
+  const re = typeof x.get == 'function'
+    ? x.get(CT)
+    : x?.[ CT ]
+  return re ?? fallback
 }
 
 /**
- * @param {string|URL} file
- * @param {string} [fallback]
+ * @param {string | URL} file
+ * @param {string} [fallback = '']
  * @return {string}
  */
 export function fromFile(file, fallback = '') {
@@ -41,8 +54,8 @@ export function fromFile(file, fallback = '') {
 }
 
 /**
- * @param {string|URL} file
- * @param {string} [fallback]
+ * @param {string | URL} file
+ * @param {string} [fallback = '']
  * @return {string}
  */
 export function extname(file, fallback = '') {
@@ -51,67 +64,46 @@ export function extname(file, fallback = '') {
 
   let ex = ''
   for (let i = file.length; i--;) {
-    if (file[ i ] == '.') break
+    if (file[ i ] == '.')
+      break
     ex = file[ i ] + ex
   }
   return ex || fallback
 }
 
-function init() {
-  const mm = Object.create(null)
-  for (const line of `
-    text/plain                         txt
-    text/html                          html
-    text/css                           css
-    text/less                          less
-    text/x-asm                         s asm
-    text/x-sass                        sass
-    text/x-scss                        scss
-    text/csv                           csv
-    text/jsx                           jsx
-    text/x-markdown                    md
-    text/yaml                          yaml yml
-    text/xml                           xml
+export const txt   = mime.txt   = 'text/plain'
+export const html  = mime.html  = 'text/html'
+export const css   = mime.css   = 'text/css'
+export const less  = mime.less  = 'text/less'
+export const csv   = mime.csv   = 'text/csv'
+export const jsx   = mime.jsx   = 'text/jsx'
+export const md    = mime.md    = 'text/x-markdown'
+export const yaml  = mime.yaml  = 'text/yaml'
+export const yml   = mime.yml   = 'text/yaml'
+export const xml   = mime.xml   = 'text/xml'
+export const gif   = mime.gif   = 'image/gif'
+export const png   = mime.png   = 'image/png'
+export const jpg   = mime.jpg   = 'image/jpeg'
+export const jpeg  = mime.jpeg  = 'image/jpeg'
+export const svg   = mime.svg   = 'image/svg+xml'
+export const svgz  = mime.svgz  = 'image/svg+xml'
+export const ico   = mime.ico   = 'image/x-icon'
+export const webp  = mime.webp  = 'image/webp'
+export const woff  = mime.woff  = 'font/woff'
+export const otf   = mime.otf   = 'font/opentype'
+export const bdf   = mime.bdf   = 'application/x-font-bdf'
+export const pcf   = mime.pcf   = 'application/x-font-pcf'
+export const snf   = mime.snf   = 'application/x-font-snf'
+export const ttf   = mime.ttf   = 'application/x-font-ttf'
+export const zip   = mime.zip   = 'application/zip'
+export const tar   = mime.tar   = 'application/zip'
+export const json  = mime.json  = 'application/json'
+export const js    = mime.js    = 'application/javascript'
+export const bin   = mime.bin   = 'application/octet-stream'
+export const dmg   = mime.dmg   = 'application/octet-stream'
+export const iso   = mime.iso   = 'application/octet-stream'
+export const img   = mime.img   = 'application/octet-stream'
+export const form  = mime.form  = 'multipart/form-data'
+export const query = mime.query = 'application/x-www-form-urlencoded'
+Object.freeze(mime)
 
-    image/gif                          gif
-    image/png                          png
-    image/jpeg                         jpg  jpeg
-    image/svg+xml                      svg  svgz
-    image/x-icon                       ico
-    image/webp                         webp
-
-    font/woff                          woff woff2
-    font/opentype                  otf
-    application/x-font-bdf         bdf
-    application/x-font-otf         otf
-    application/x-font-pcf         pcf
-    application/x-font-snf         snf
-    application/x-font-ttf         ttf ttc
-    application/x-font-type1       pfa pfb pfm afm
-    application/x-font-linux-psf   psf
-
-    application/zip                    zip tar
-    application/json                   json
-    application/javascript             js
-    application/octet-stream           bin dmg iso img
-
-    multipart/form-data                form
-    application/x-www-form-urlencoded  query
-
-  `.trim().split(/\n+/g)) {
-    const [ type, ...alias ] = line.match(/\S+/g)
-    mm[ type ] = type
-    for (let a of alias)
-      mm[ a ] = type
-
-  }
-  return Object.freeze(mm)
-}
-
-export const {
-  txt,  css,  html,
-  ico,  svg,  woff,
-  gif,  png,  jpg,
-  xml,  json, js,
-  bin,  zip,  form, query,
-} = mime
