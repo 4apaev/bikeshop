@@ -1,18 +1,13 @@
 // @ts-check
 import Fs from 'fs'
 import Emitter from 'events'
-import {
-  format as frmt,
-} from 'util'
-import {
-  Transform,
-} from 'stream'
-
+import { Transform } from 'stream'
 import { period } from '../util/date.js'
 
 const DELAY = 3000
 const cwd = process.cwd()
 
+const LF = '\r\n'
 export const Evt = new Emitter
 
 /**
@@ -87,9 +82,9 @@ function transform(chunk, enc, cb) {
  */
 export function format(msg) {
   const re = typeof msg == 'string'
-    ? frmt('data: %s\n', msg)
-    : Object.keys(msg).reduce((re, k) => re + frmt('%s: %j\n', k, msg[ k ]), '')
-  return re + '\n\n'
+    ? 'data:' + msg + LF
+    : Object.keys(msg).reduce((re, k) => re + k + ':' + JSON.stringify(msg[ k ]) + LF, '')
+  return re + LF
 }
 
 /**
