@@ -24,16 +24,15 @@
     import SSE  from '/js/sse.js'
 
     const Log = use(console.log, console)
-
+    const sse = SSE()
     assign(window, {
       A: Array,  O: Object,
       S: String, N: Number,
       use,  alias,  assign,
       each, reduce, entries,
-      SSE,  Sync,   Log, log: Log,
+      sse,  Sync,   Log, log: Log,
       Is,   $,
-    })
-    Log('🚥 READY 🚥')
+    });
   </script>
 </head>
 
