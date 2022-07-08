@@ -3,9 +3,9 @@
     {
       "path": ".."
     },
+    {
+      "path": "../../../.vscode/extensions/shoshi"
+    },
   ],
-  "settings": {
-
-  }
+  "settings": {}
 }
-
