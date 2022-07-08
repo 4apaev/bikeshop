@@ -6,14 +6,14 @@ a
     color: $.info.a
 
 input, button
-  padding: 0 1em
-  line-height: 2
-  transition: all .25s
-  border-radius: $.radius.a
+  padding       : 0 1em
+  line-height   : 2
+  transition    : all .25s
+  border-radius : $.radius.a
 
-  color: $.fg.b
-  border: 1px solid $.br.b
-  background-color: $.bg.b
+  color            : $.fg.b
+  border           : 1px solid $.br.b
+  background-color : $.bg.b
 
   &:focus
     border: 1px solid $.br.c
@@ -24,7 +24,6 @@ input, button
 input:not(:placeholder-shown)
   &:valid
     border-color: $.ok.a
-
   &:invalid
     border-color: $.err.a
 
@@ -35,16 +34,16 @@ input:not(:placeholder-shown)
   min-width fit-content
 
 .btn.ok
-  colorize('ok', 'b', 'a', 'c')
+  colorize: 'ok' 'b' 'a' 'c'
 
 .btn.info
-  colorize('info', 'b', 'a', 'c')
+  colorize: 'info' 'b' 'a' 'c'
 
 .btn.warn
-  colorize('warn', 'b', 'a', 'c')
+  colorize: 'warn' 'b' 'a' 'c'
 
 .btn.err
-  colorize('err', 'b', 'a', 'c')
+  colorize: 'err' 'b' 'a' 'c'
 
 .btn-group
   display         : flex
@@ -93,6 +92,7 @@ form
     box-shadow  : inset 0 1px 0 $.br.a
     &:last-child
       box-shadow: inset 0 1px 0 $.br.a ,inset 0 -1px 0 $.br.a
+
     label
       padding    : 0 1em
       line-height: 2

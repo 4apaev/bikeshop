@@ -312,4 +312,5 @@ pre:focus {
 .grid-box .grid.page {
   grid-area: page;
   overflow-y: auto;
+  padding: 1rem;
 }
