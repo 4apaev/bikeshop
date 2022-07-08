@@ -17,21 +17,38 @@
       assign,
       entries,
       reduce,
-      each }    from '/util/define.js'
+      each,
+    } from '/util/define.js'
+
     import Is   from '/util/is.js'
     import Sync from '/js/sync.js'
     import $    from '/js/dom.js'
     import SSE  from '/js/sse.js'
 
     const Log = use(console.log, console)
+    Log.g = console.group
+    Log.gc = console.groupCollapsed
+    Log.end = console.groupEnd
+
     const sse = SSE()
+
     assign(window, {
-      A: Array,  O: Object,
-      S: String, N: Number,
-      use,  alias,  assign,
-      each, reduce, entries,
-      sse,  Sync,   Log, log: Log,
-      Is,   $,
+      A: Array,
+      O: Object,
+      S: String,
+      N: Number,
+      use,
+      alias,
+      assign,
+      each,
+      reduce,
+      entries,
+      SSE,
+      sse,
+      Sync,
+      Log,
+      Is,
+      $,
     });
   </script>
 </head>
