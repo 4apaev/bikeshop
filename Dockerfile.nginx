@@ -1,8 +1,7 @@
 FROM nginx:alpine
 
 
-ARG SITE_NAME=garage.dog
-ARG SITE_DIR=/var/www/${SITE_NAME}/html
+ARG SITE_DIR=/var/www/bork.dog/html
 
 RUN mkdir -p ${SITE_DIR}
 COPY pub ${SITE_DIR}
