@@ -46,7 +46,7 @@ app.post('/api/user-bikes', UBike.create)
 app.post('/api/auth/login', User.auth)
 
 // ////////////////////////////////////////////////// echo
-app.get('/healtcheck', echo)
+app.get('/api/healtcheck', echo)
 
 // ////////////////////////////////////////////////// static
 
